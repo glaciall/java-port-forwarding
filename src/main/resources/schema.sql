@@ -6,7 +6,7 @@ create table if not exists users(
   salt varchar(16),
   accesstoken varchar(32),
   rand varchar(16),
-  last_login_time datetime,
+  last_login_time integer,
   last_login_ip varchar(20)
 );
 
@@ -19,7 +19,7 @@ create table if not exists clients
   state integer not null,
   accesstoken varchar(64),
   ip varchar(100),
-  last_active_time datetime
+  last_active_time integer
 );
 
 /* ports 端口映射表 */
@@ -30,6 +30,6 @@ create table if not exists ports
   server_port integer NOT NULL,
   client_port integer NOT NULL,
   state integer DEFAULT 0,
-  create_time DATETIME,
-  last_active_time DATETIME
+  create_time integer,
+  last_active_time integer
 );

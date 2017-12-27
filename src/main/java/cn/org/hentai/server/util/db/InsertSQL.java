@@ -113,10 +113,10 @@ public class InsertSQL extends DBSQL
         return this.getJdbcTemplate().update(toSQL(false), this.values);
     }
 
-    public Long save()
+    public int save()
     {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        long autoIncId = 0;
+        int autoIncId = 0;
 
         jdbcTemplate.update(new PreparedStatementCreator()
         {
@@ -127,7 +127,7 @@ public class InsertSQL extends DBSQL
             }
         }, keyHolder);
 
-        autoIncId = keyHolder.getKey().longValue();
+        autoIncId = keyHolder.getKey().intValue();
         return autoIncId;
     }
 

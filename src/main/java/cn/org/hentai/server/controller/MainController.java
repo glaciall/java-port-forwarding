@@ -1,11 +1,16 @@
 package cn.org.hentai.server.controller;
 
+import cn.org.hentai.server.dao.ClientDAO;
 import cn.org.hentai.server.dao.UserDAO;
+import cn.org.hentai.server.model.Client;
+import cn.org.hentai.server.model.Page;
 import cn.org.hentai.server.model.Result;
 import cn.org.hentai.server.model.User;
 import cn.org.hentai.server.util.Configs;
 import cn.org.hentai.server.util.Log;
 import cn.org.hentai.server.util.MD5;
+import cn.org.hentai.server.util.NonceStr;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.util.Date;
 
 /**
@@ -25,35 +32,95 @@ public class MainController
     @Autowired
     UserDAO userDAO;
 
+    @Autowired
+    ClientDAO clientDAO;
+
     @RequestMapping("/")
-    public String index(Model model)
+    public String index()
     {
-        model.addAttribute("user", userDAO.getById(1));
+        boolean hasDB = new File("jforwarding.sqlite").exists();
         return "login";
+    }
+
+    @RequestMapping("/setup")
+    public String setup()
+    {
+        return "setup";
     }
 
     @RequestMapping("/login")
     @ResponseBody
-    public Result login(@RequestParam String name, @RequestParam String password)
+    public Result login(HttpSession session, @RequestParam String name, @RequestParam String password)
     {
         Result result = new Result();
         User user = userDAO.getByName(name);
         if (null == user) throw new RuntimeException("无此用户");
 
         // 密码校验
-        String pwd = MD5.encode(password + user.getSalt() + Configs.get("user.token.key"));
+        String pwd = MD5.encode(password + "<===>" + user.getSalt());
         if (!pwd.equals(user.getPassword())) throw new RuntimeException("用户名或密码错误");
 
-        // 生成accesstoken
-
-        // TODO: 做一个简单的限制，在5分钟内不允许有3次以上的登陆失败
+        session.setAttribute("user", user);
 
         return result;
     }
 
-    // TODO: 登陆后的首页
-    // TODO: 用户管理
-    // TODO: 主机管理
+    @RequestMapping("/host")
+    public String host()
+    {
+        return "host";
+    }
+
+    @RequestMapping("/host/json")
+    @ResponseBody
+    public Result hostJson(@RequestParam(required = false, defaultValue = "1") int pageIndex, @RequestParam(required = false, defaultValue = "50") int pageSize)
+    {
+        Result result = new Result();
+        Page<Client> clients = new Page(pageIndex, pageSize);
+        clients.setList(clientDAO.find(pageIndex, pageSize));
+        clients.setRecordCount(clientDAO.findCount());
+        result.setData(clients);
+        return result;
+    }
+
+    @RequestMapping("/host/add")
+    @ResponseBody
+    public Result addHost(@RequestParam String name)
+    {
+        Result result = new Result();
+
+        Client client = new Client();
+        client.setState(1);
+        client.setName(name);
+        client.setLastActiveTime(0);
+        client.setIp(null);
+        client.setAccesstoken(NonceStr.generate(64));
+        clientDAO.save(client);
+
+        result.setData(client);
+        return result;
+    }
+
+    @RequestMapping("/host/renew")
+    @ResponseBody
+    public Result renewHostToken(@RequestParam int id)
+    {
+        Result result = new Result();
+        try
+        {
+            Client client = clientDAO.getById(id);
+            if (null == client) throw new RuntimeException("无此主机");
+
+            client.setAccesstoken(NonceStr.generate(64));
+            clientDAO.update(client);
+        }
+        catch(Exception e)
+        {
+            result.setError(e);
+        }
+        return result;
+    }
+
     // TODO: 端口管理
     // TODO: 系统设置？
 }

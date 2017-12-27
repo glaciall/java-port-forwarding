@@ -22,7 +22,7 @@ public class CommonInterceptor extends HandlerInterceptorAdapter
         String path = request.getContextPath();
         if (!path.endsWith("/")) path = path + "/";
         request.setAttribute("context", "/".equals(path) ? "" : path);
-        request.setAttribute("resource", path + "static/");
+        request.setAttribute("web_resource", path + "static/");
         return true;
     }
 
