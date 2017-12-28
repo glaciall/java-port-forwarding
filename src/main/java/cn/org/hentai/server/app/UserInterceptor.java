@@ -29,39 +29,7 @@ public class UserInterceptor extends HandlerInterceptorAdapter
                              Object handler) throws Exception
     {
         // 获取登陆的用户身份
-        Map<String, String> cookies = new HashMap<String, String>();
-        Cookie[] cks = request.getCookies();
-        cks = cks == null ? new Cookie[0] : cks;
-        for (int i = 0; i < cks.length; i++) cookies.put(cks[i].getName(), cks[i].getValue());
-
-        if (!cookies.containsKey("user_id") || !cookies.containsKey("token"))
-        {
-            response.sendRedirect(request.getContextPath() + "/");
-            return false;
-        }
-        long userId = Long.parseLong(cookies.get("user_id"));
-        String token = cookies.get("token");
-
-        User user = userDAO.getById(userId);
-        if (null == user)
-        {
-            response.sendRedirect(request.getContextPath() + "/");
-            return false;
-        }
-
-        if (!token.equals(user.getAccesstoken()))
-        {
-            response.sendRedirect(request.getContextPath() + "/");
-            return false;
-        }
-
-        int minutes = Configs.getInt("user.token.expire.minutes", 60 * 24);
-        if (user.getLastLoginTime().getTime() + 1000L * 60 * minutes < System.currentTimeMillis())
-        {
-            response.sendRedirect(request.getContextPath() + "/");
-            return false;
-        }
-
+        User user = (User)request.getSession().getAttribute("loginUser");
         request.setAttribute("loginUser", user);
         return true;
     }

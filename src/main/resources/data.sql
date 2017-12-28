@@ -1,0 +1,1 @@
+replace into users (id, name, password, salt, accesstoken, rand, last_login_time, last_login_ip) values (1, 'admin', 'db01b39338fe96e8abaa773770a625c2', 'VH3940Y92YUIHW', '', '', 1514469634632, '192.168.1.1');

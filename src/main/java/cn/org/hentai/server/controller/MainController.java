@@ -50,28 +50,34 @@ public class MainController
 
     @RequestMapping("/login")
     @ResponseBody
-    public Result login(HttpSession session, @RequestParam String name, @RequestParam String password)
+    public Result login(HttpSession session, @RequestParam String username, @RequestParam String password)
     {
         Result result = new Result();
-        User user = userDAO.getByName(name);
-        if (null == user) throw new RuntimeException("无此用户");
+        try
+        {
+            User user = userDAO.getByName(username);
+            if (null == user) throw new RuntimeException("无此用户");
 
-        // 密码校验
-        String pwd = MD5.encode(password + "<===>" + user.getSalt());
-        if (!pwd.equals(user.getPassword())) throw new RuntimeException("用户名或密码错误");
+            // 密码校验
+            String pwd = MD5.encode(password + "<===>" + user.getSalt());
+            if (!pwd.equals(user.getPassword())) throw new RuntimeException("用户名或密码错误");
 
-        session.setAttribute("user", user);
-
+            session.setAttribute("loginUser", user);
+        }
+        catch(Exception e)
+        {
+            result.setError(e);
+        }
         return result;
     }
 
-    @RequestMapping("/host")
+    @RequestMapping("/manage/host")
     public String host()
     {
         return "host";
     }
 
-    @RequestMapping("/host/json")
+    @RequestMapping("/manage/host/json")
     @ResponseBody
     public Result hostJson(@RequestParam(required = false, defaultValue = "1") int pageIndex, @RequestParam(required = false, defaultValue = "50") int pageSize)
     {
@@ -83,25 +89,32 @@ public class MainController
         return result;
     }
 
-    @RequestMapping("/host/add")
+    @RequestMapping("/manage/host/add")
     @ResponseBody
     public Result addHost(@RequestParam String name)
     {
         Result result = new Result();
 
-        Client client = new Client();
-        client.setState(1);
-        client.setName(name);
-        client.setLastActiveTime(0);
-        client.setIp(null);
-        client.setAccesstoken(NonceStr.generate(64));
-        clientDAO.save(client);
+        try
+        {
+            Client client = new Client();
+            client.setState(1);
+            client.setName(name);
+            client.setLastActiveTime(0);
+            client.setIp(null);
+            client.setAccesstoken(NonceStr.generate(64));
+            clientDAO.save(client);
 
-        result.setData(client);
+            result.setData(client);
+        }
+        catch(Exception e)
+        {
+            result.setError(e);
+        }
         return result;
     }
 
-    @RequestMapping("/host/renew")
+    @RequestMapping("/manage/host/renew")
     @ResponseBody
     public Result renewHostToken(@RequestParam int id)
     {
@@ -118,6 +131,44 @@ public class MainController
         {
             result.setError(e);
         }
+        return result;
+    }
+
+    @RequestMapping("/manage/host/rename")
+    @ResponseBody
+    public Result renameHost(@RequestParam int id, @RequestParam String name)
+    {
+        Result result = new Result();
+        try
+        {
+            Client host = clientDAO.getById(id);
+            if (null == host) throw new RuntimeException("无此主机");
+
+            host.setName(name);
+            clientDAO.update(host);
+        }
+        catch(Exception e)
+        {
+            result.setError(e);
+        }
+        return result;
+    }
+
+    @RequestMapping("/manage/host/remove")
+    @ResponseBody
+    public Result removeHost(@RequestParam int id)
+    {
+        Result result = new Result();
+
+        try
+        {
+            clientDAO.delete(id);
+        }
+        catch(Exception e)
+        {
+            result.setError(e);
+        }
+
         return result;
     }
 

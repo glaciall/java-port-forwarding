@@ -7,15 +7,15 @@
     <title>登陆到控制台</title>
 
     <!-- Favicon and touch icons -->
-    <link rel="shortcut icon" href="${resource}proton/ico/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="${web_resource}proton/ico/favicon.ico" type="image/x-icon" />
 
     <!-- Css files -->
-    <link href="${resource}proton/css/bootstrap.min.css" rel="stylesheet">
-    <link href="${resource}proton/css/jquery.mmenu.css" rel="stylesheet">
-    <link href="${resource}proton/css/font-awesome.min.css" rel="stylesheet">
-    <link href="${resource}proton/plugins/jquery-ui/css/jquery-ui-1.10.4.min.css" rel="stylesheet">
-    <link href="${resource}proton/css/style.min.css" rel="stylesheet">
-    <link href="${resource}proton/css/add-ons.min.css" rel="stylesheet">
+    <link href="${web_resource}proton/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${web_resource}proton/css/jquery.mmenu.css" rel="stylesheet">
+    <link href="${web_resource}proton/css/font-awesome.min.css" rel="stylesheet">
+    <link href="${web_resource}proton/plugins/jquery-ui/css/jquery-ui-1.10.4.min.css" rel="stylesheet">
+    <link href="${web_resource}proton/css/style.min.css" rel="stylesheet">
+    <link href="${web_resource}proton/css/add-ons.min.css" rel="stylesheet">
     <style>
         footer {
             display: none;
@@ -73,20 +73,20 @@
 <!-- start: JavaScript-->
 <!--[if !IE]>-->
 
-<script src="${resource}proton/js/jquery-2.1.1.min.js"></script>
+<script src="${web_resource}proton/js/jquery-2.1.1.min.js"></script>
 
 <!--<![endif]-->
 
 <!--[if IE]>
 
-<script src="${resource}proton/js/jquery-1.11.1.min.js"></script>
+<script src="${web_resource}proton/js/jquery-1.11.1.min.js"></script>
 
 <![endif]-->
 
 <!--[if !IE]>-->
 
 <script type="text/javascript">
-    window.jQuery || document.write("<script src='${resource}proton/js/jquery-2.1.1.min.js'>"+"<"+"/script>");
+    window.jQuery || document.write("<script src='${web_resource}proton/js/jquery-2.1.1.min.js'>"+"<"+"/script>");
 </script>
 
 <!--<![endif]-->
@@ -94,19 +94,19 @@
 <!--[if IE]>
 
 <script type="text/javascript">
-    window.jQuery || document.write("<script src='${resource}proton/js/jquery-1.11.1.min.js'>"+"<"+"/script>");
+    window.jQuery || document.write("<script src='${web_resource}proton/js/jquery-1.11.1.min.js'>"+"<"+"/script>");
 </script>
 
 <![endif]-->
-<script src="${resource}proton/js/jquery-migrate-1.2.1.min.js"></script>
-<script src="${resource}proton/js/bootstrap.min.js"></script>
+<script src="${web_resource}proton/js/jquery-migrate-1.2.1.min.js"></script>
+<script src="${web_resource}proton/js/bootstrap.min.js"></script>
 
 
 <!-- page scripts -->
 
 <!-- theme scripts -->
-<script src="${resource}proton/js/SmoothScroll.js"></script>
-<script src="${resource}proton/js/jquery.mmenu.min.js"></script>
+<script src="${web_resource}proton/js/SmoothScroll.js"></script>
+<script src="${web_resource}proton/js/jquery.mmenu.min.js"></script>
 
 <!-- end: JavaScript-->
 <script type="text/javascript">
@@ -118,10 +118,10 @@
             var password = $.trim($('#password').val());
             if (username == '' || password == '') return alert('请输入用户名及密码进行登陆'), false;
 
-            $.post('${context!'abc'}/login', { username : username, password : password }, function(result)
+            $.post('${context}/login', { username : username, password : password }, function(result)
             {
                 if (result.error.code) return alert(result.error.reason);
-                location.href = '${context}manage/';
+                location.href = '${context}/manage/host';
             });
         });
     });

@@ -268,5 +268,32 @@ window.jQuery || document.write("<script src='${web_resource}/proton/js/jquery-1
             hideDialog();
         }, options.timeout);
     }
+
+    $.fn.extend({
+        animateCss: function (animationName, callback) {
+            var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+            this.addClass('animated ' + animationName).one(animationEnd, function() {
+                $(this).removeClass('animated ' + animationName);
+                if (callback) {
+                    callback();
+                }
+            });
+            return this;
+        }
+    });
+    function greeting(text, timeout)
+    {
+        timeout = timeout || 4000;
+        var greeting = $('<div class="greeting">' + text + '</div>');
+        $(document.body).append(greeting);
+        greeting.show().animateCss('bounceIn', function()
+        {
+            setTimeout(function()
+            {
+                greeting.remove();
+            }, timeout);
+        });
+    }
+
 </script>
 <!-- end: JavaScript-->

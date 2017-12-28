@@ -6,7 +6,7 @@
         </div>
         <div class="sidebar-menu">
             <ul class="nav nav-sidebar">
-                <li><a href="${context}/host"><i class="fa fa-laptop"></i><span class="text"> 主机管理</span></a></li>
+                <li><a href="${context}/manage/host"><i class="fa fa-laptop"></i><span class="text"> 主机管理</span></a></li>
             </ul>
         </div>
     </div>

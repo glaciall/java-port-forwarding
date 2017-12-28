@@ -16,6 +16,7 @@
 <link href="${web_resource}/proton/plugins/jvectormap/css/jquery-jvectormap-1.2.2.css" rel="stylesheet">
 <link href="${web_resource}/proton/css/style.min.css" rel="stylesheet">
 <link href="${web_resource}/proton/css/add-ons.min.css" rel="stylesheet">
+<link href="//apps.bdimg.com/libs/animate.css/3.1.0/animate.min.css" rel="stylesheet" />
 <style type="text/css">
     .table tbody td { vertical-align: middle !important; }
 </style>
