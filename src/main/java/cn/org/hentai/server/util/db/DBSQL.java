@@ -28,7 +28,6 @@ public class DBSQL
 
     protected JdbcTemplate getJdbcTemplate()
     {
-        Log.debug("jdbcTemplate: " + jdbcTemplate);
         return this.jdbcTemplate;
     }
 

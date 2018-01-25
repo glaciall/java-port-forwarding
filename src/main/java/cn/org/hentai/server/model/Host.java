@@ -3,7 +3,7 @@ package cn.org.hentai.server.model;
 /**
  * Created by Expect on 2017/12/27.
  */
-public class Client extends BaseModel
+public class Host extends BaseModel
 {
     private int id;
     private int userId;
@@ -71,7 +71,7 @@ public class Client extends BaseModel
 
     @Override
     public String toString() {
-        return "Client{" +
+        return "Host{" +
                 "id=" + id +
                 ", userId=" + userId +
                 ", name='" + name + '\'' +

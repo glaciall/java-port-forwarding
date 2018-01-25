@@ -10,8 +10,8 @@ create table if not exists users(
   last_login_ip varchar(20)
 );
 
-/* clients 客户机信息表 */
-create table if not exists clients
+/* hosts 主机信息表 */
+create table if not exists hosts
 (
   id integer primary key AUTOINCREMENT not NULL,
   user_id integer not null,
@@ -27,9 +27,13 @@ create table if not exists ports
 (
   id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   user_id integer NOT NULL,
-  server_port integer NOT NULL,
-  client_port integer NOT NULL,
+  host_id integer NOT NULL,
+  listen_port integer NOT NULL,
+  host_port integer NOT NULL,
+  so_timeout integer NOT NULL,
+  concurrent_connections integer NOT NULL,
   state integer DEFAULT 0,
   create_time integer,
   last_active_time integer
 );
+CREATE UNIQUE INDEX ports_listen_port_uindex ON ports(listen_port);
