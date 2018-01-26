@@ -1,6 +1,7 @@
 package cn.org.hentai.server.proxy;
 
 import cn.org.hentai.server.util.ByteUtils;
+import cn.org.hentai.server.util.Log;
 import cn.org.hentai.util.DES;
 
 import java.io.ByteArrayOutputStream;
@@ -14,30 +15,31 @@ public final class Packet
     // 读取一整个包
     public static byte[] read(InputStream reader) throws Exception
     {
+        return read(reader, false);
+    }
+
+    public static byte[] read(InputStream reader, boolean wait) throws Exception
+    {
         ByteArrayOutputStream buff = new ByteArrayOutputStream(512);
-        int buffByteCount = reader.available();
-        if (buffByteCount == 0) return null;
-        byte[] data = new byte[Math.max(buffByteCount, 13)];
+        while (wait && reader.available() < 13) Thread.sleep(10);
+        if (reader.available() < 13) return null;
+        byte[] data = new byte[13];
 
         // 读取包头
         reader.read(data);
 
         // 协议头检测
-        if (data[0] != 0xfa || data[1] != 0xfa || data[2] != 0xfa) throw new RuntimeException("错误的协议头");
+        if ((data[0] & 0xff) != 0xfa || (data[1] & 0xff) != 0xfa || (data[2] & 0xff) != 0xfa) throw new RuntimeException("错误的协议头");
 
         // 数据体长度
         int bodyLength = ByteUtils.getInt(data, 3, 4);
         buff.write(data);
 
         // 读取数据体
-        int blockCount = (int)Math.ceil(bodyLength / 512f);
-        data = new byte[512];
-        for (int i = 0; i < blockCount; i++)
-        {
-            int len = reader.read(data);
-            buff.write(data, 0, len);
-        }
-
+        data = new byte[bodyLength];
+        int recv = reader.read(data);
+        if (bodyLength != recv) throw new RuntimeException("cannot read enough data from stream");
+        buff.write(data);
         return buff.toByteArray();
     }
 
@@ -54,7 +56,6 @@ public final class Packet
         if (encryptType == 0x00) ;
         else if (encryptType == 0x01) encryptedData = DES.encrypt(data, accesstoken);
         else throw new RuntimeException("unsupported encrypt method: " + encryptType);
-        System.err.println("Encrypt: " + ByteUtils.toString(encryptedData));
 
         int encryptedDataLength = encryptedData.length;
         byte[] packet = new byte[3 + 4 + 4 + 2 + encryptedDataLength];

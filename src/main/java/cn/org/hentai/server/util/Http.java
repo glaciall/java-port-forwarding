@@ -81,7 +81,7 @@ public final class Http
             }
             client = HttpClients.createDefault();
             // TODO: 什么时候试一试超时的可用性再说
-            // client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 4000);
+            // host.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 4000);
 
             response = client.execute(httpGet);
             HttpEntity entity = response.getEntity();
@@ -121,7 +121,7 @@ public final class Http
 
             client = HttpClients.createDefault();
             // TODO: 什么时候试一试超时的可用性再说
-            // client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 4000);
+            // host.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 4000);
 
             response = client.execute(httpPost);
             HttpEntity entity = response.getEntity();
@@ -153,7 +153,7 @@ public final class Http
 
             client = HttpClients.createDefault();
             // TODO: 什么时候试一试超时的可用性再说
-            // client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 4000);
+            // host.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 4000);
 
             response = client.execute(httpPost);
             HttpEntity entity = response.getEntity();

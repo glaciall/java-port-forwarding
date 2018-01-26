@@ -28,7 +28,7 @@ create table if not exists ports
   id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   user_id integer NOT NULL,
   host_id integer NOT NULL,
-  listen_port integer NOT NULL,
+  listen_port integer NOT NULL UNIQUE,
   host_port integer NOT NULL,
   so_timeout integer NOT NULL,
   concurrent_connections integer NOT NULL,
@@ -36,4 +36,3 @@ create table if not exists ports
   create_time integer,
   last_active_time integer
 );
-CREATE UNIQUE INDEX ports_listen_port_uindex ON ports(listen_port);

@@ -1,4 +1,4 @@
-package cn.org.hentai.client;
+package cn.org.hentai.host;
 
 import cn.org.hentai.util.ByteUtils;
 
@@ -51,7 +51,7 @@ public class Forwarding
                             {
                                 bufLength = reader.read(buff);
                                 System.out.println("Length: " + bufLength);
-                                System.out.println("Response from client: " + ByteUtils.toString(buff, bufLength));
+                                System.out.println("Response from host: " + ByteUtils.toString(buff, bufLength));
                                 os.write(buff, 0, bufLength);
                             }
                             Thread.sleep(100);

@@ -1,5 +1,7 @@
 package cn.org.hentai.server.app;
 
+import cn.org.hentai.server.proxy.CommandServer;
+import cn.org.hentai.server.util.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -26,6 +28,8 @@ public class ServerApplication
     public static void main(String[] args) throws Exception
     {
         ApplicationContext context = SpringApplication.run(ServerApplication.class, args);
+        BeanUtils.init(context);
+        new Thread(new CommandServer()).start();
     }
 
     @Bean

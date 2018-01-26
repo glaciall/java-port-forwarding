@@ -4,6 +4,8 @@ import cn.org.hentai.server.model.Host;
 import cn.org.hentai.server.util.Configs;
 import cn.org.hentai.server.util.Log;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +24,8 @@ public class CommandServer implements Runnable
         try
         {
             listenPort = Configs.getInt("command.server.port", 9999);
-            server = new ServerSocket(listenPort, 1000);
+            server = new ServerSocket(listenPort, 1000, InetAddress.getByName("0.0.0.0"));
+            Log.debug("Command Server started...");
             while (true)
             {
                 Socket client = server.accept();

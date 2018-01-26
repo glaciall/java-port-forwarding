@@ -2,9 +2,12 @@ package cn.org.hentai.server.proxy;
 
 import cn.org.hentai.server.dao.HostDAO;
 import cn.org.hentai.server.model.Host;
+import cn.org.hentai.server.util.BeanUtils;
 import cn.org.hentai.server.util.Log;
 import cn.org.hentai.server.util.NonceStr;
+import cn.org.hentai.util.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,9 +18,7 @@ import java.net.Socket;
  */
 public class CommandSession extends SocketSession
 {
-    @Autowired
     HostDAO hostDAO;
-
     Host host = null;
     Socket client = null;
     long lastActiveTime = System.currentTimeMillis();
@@ -25,6 +26,7 @@ public class CommandSession extends SocketSession
     public CommandSession(Socket client)
     {
         this.client = client;
+        hostDAO = BeanUtils.create(HostDAO.class);
     }
 
     @Override
@@ -33,7 +35,7 @@ public class CommandSession extends SocketSession
         InputStream inputStream = this.client.getInputStream();
         OutputStream outputStream = this.client.getOutputStream();
         // 先读取一个包，确定一下主机端的身份
-        host = authenticate(inputStream);
+        host = authenticate(inputStream, outputStream);
         CommandServer.register(host);
 
         while (true)
@@ -42,6 +44,8 @@ public class CommandSession extends SocketSession
             testConnection(inputStream, outputStream);
             // 是否有需要下发的指令？
             // 是否有上发的数据包？
+
+            Thread.sleep(10);
         }
     }
 
@@ -65,13 +69,16 @@ public class CommandSession extends SocketSession
      * @param inputStream
      * @throws Exception
      */
-    private Host authenticate(InputStream inputStream) throws Exception
+    private Host authenticate(InputStream inputStream, OutputStream outputStream) throws Exception
     {
-        byte[] packet = Packet.read(inputStream);
+        byte[] packet = Packet.read(inputStream, true);
+        System.out.println("Test XXXX");
+        Log.debug("Recv: " + ByteUtils.toString(packet));
         int hostId = Packet.getHostId(packet);
         Host host = hostDAO.getById(hostId);
         if (null == host) throw new RuntimeException("no such host: " + hostId);
-        byte[] data = Packet.getData(packet, host.getAccesstoken());
+        Packet.getData(packet, host.getAccesstoken());
+        outputStream.write(Packet.create(hostId, Constants.ENCRYPT_TYPE_DES, Constants.COMMAND_AUTHENTICATION, NonceStr.generate(32).getBytes(), host.getAccesstoken()));
         return host;
     }
 
