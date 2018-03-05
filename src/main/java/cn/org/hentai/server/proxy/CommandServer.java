@@ -39,15 +39,15 @@ public class CommandServer implements Runnable
         }
     }
 
-    protected static ConcurrentMap<Integer, Host> hostSessions = new ConcurrentHashMap<>();
-    protected static Host getSession(int hostId)
+    protected static ConcurrentMap<Integer, CommandSession> hostSessions = new ConcurrentHashMap<Integer, CommandSession>();
+    protected static CommandSession getSession(int hostId)
     {
         return hostSessions.get(hostId);
     }
 
-    protected static void register(Host host)
+    protected static void register(Host host, CommandSession session)
     {
-        hostSessions.put(host.getId(), host);
+        hostSessions.put(host.getId(), session);
     }
 
     protected static void release(Host host)

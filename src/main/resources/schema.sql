@@ -31,6 +31,7 @@ create table if not exists ports
   listen_port integer NOT NULL UNIQUE,
   host_port integer NOT NULL,
   so_timeout integer NOT NULL,
+  connect_timeout integer not null default 30,
   concurrent_connections integer NOT NULL,
   state integer DEFAULT 0,
   create_time integer,

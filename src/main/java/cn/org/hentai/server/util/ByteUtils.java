@@ -81,37 +81,11 @@ public final class ByteUtils
         return ((data[pos / 8] >> (pos % 8)) & 0x01) == 0x01;
     }
 
-    public static void main(String[] args) throws Exception
+    public static byte[] concat(byte[] data1, byte[] data2)
     {
-        System.out.println(Integer.toHexString(ByteUtils.reverse((0x41fa3be1))));
-    }
-
-    public static void mains(String[] args) throws Exception
-    {
-        String[] hex = "0B 01 01 00 01 86 01 02 00 00 02 03 00 00 00 03 08 6C 3A FA 41 2D C7 F0 42 05 02 00 00 BA AC".split(" ");
-        byte[] data = new byte[hex.length];
-        for (int i = 0; i < hex.length; i++) data[i] = (byte)(Integer.parseInt(hex[i], 16) & 0xff);
-        System.out.println("Bytes: " + data.length);
-        System.out.println(ByteUtils.toString(data));
-        System.out.println(ByteUtils.getLong(data, 0, 5));
-
-        long deviceId = ByteUtils.getLong(data, 0, 5);
-        int voltage = ByteUtils.getInt(data, 8, 2);
-        int currentIndex = data[12];
-        int currentAh = ByteUtils.getInt(data, 13, 2);
-        int latitude = ByteUtils.getInt(data, 17, 4);
-        int longitude = ByteUtils.getInt(data, 21, 4);
-        int state = ByteUtils.getInt(data, 27, 2);
-        int crc = ByteUtils.getInt(data, 29, 2);
-
-        System.out.println("Voltage: " + voltage);
-        System.out.println("CurrentIndex: " + currentIndex);
-        System.out.println("Current Ah: " + currentAh);
-        System.out.println("Longitude: " + longitude);
-        System.out.println("Latitude: " + latitude);
-        System.out.println("State: " + state);
-        System.out.println("CRC: " + Integer.toHexString(crc));
-
-        new FileOutputStream("d:\\fuck3.dat").write(data);
+        byte[] result = new byte[data1.length + data2.length];
+        System.arraycopy(data1, 0, result, 0, data1.length);
+        System.arraycopy(data2, 0, result, data1.length, data2.length);
+        return result;
     }
 }

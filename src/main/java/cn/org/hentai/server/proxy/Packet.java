@@ -1,5 +1,6 @@
 package cn.org.hentai.server.proxy;
 
+import cn.org.hentai.server.proxy.command.Command;
 import cn.org.hentai.server.util.ByteUtils;
 import cn.org.hentai.server.util.Log;
 import cn.org.hentai.util.DES;
@@ -41,6 +42,11 @@ public final class Packet
         if (bodyLength != recv) throw new RuntimeException("cannot read enough data from stream");
         buff.write(data);
         return buff.toByteArray();
+    }
+
+    public static byte[] create(int hostId, int encryptType, Command command, String accesstoken) throws Exception
+    {
+        return create(hostId, encryptType, command.getCode(), command.getBytes(), accesstoken);
     }
 
     /*
