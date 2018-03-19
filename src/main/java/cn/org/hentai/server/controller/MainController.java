@@ -1,26 +1,21 @@
 package cn.org.hentai.server.controller;
 
-import cn.org.hentai.server.dao.ClientDAO;
+import cn.org.hentai.server.dao.HostDAO;
 import cn.org.hentai.server.dao.UserDAO;
-import cn.org.hentai.server.model.Client;
+import cn.org.hentai.server.model.Host;
 import cn.org.hentai.server.model.Page;
 import cn.org.hentai.server.model.Result;
 import cn.org.hentai.server.model.User;
-import cn.org.hentai.server.util.Configs;
-import cn.org.hentai.server.util.Log;
 import cn.org.hentai.server.util.MD5;
 import cn.org.hentai.server.util.NonceStr;
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
-import java.util.Date;
 
 /**
  * Created by matrixy on 2017-12-12.
@@ -33,7 +28,7 @@ public class MainController
     UserDAO userDAO;
 
     @Autowired
-    ClientDAO clientDAO;
+    HostDAO hostDAO;
 
     @RequestMapping("/")
     public String index()
@@ -82,9 +77,9 @@ public class MainController
     public Result hostJson(@RequestParam(required = false, defaultValue = "1") int pageIndex, @RequestParam(required = false, defaultValue = "50") int pageSize)
     {
         Result result = new Result();
-        Page<Client> clients = new Page(pageIndex, pageSize);
-        clients.setList(clientDAO.find(pageIndex, pageSize));
-        clients.setRecordCount(clientDAO.findCount());
+        Page<Host> clients = new Page(pageIndex, pageSize);
+        clients.setList(hostDAO.find(pageIndex, pageSize));
+        clients.setRecordCount(hostDAO.findCount());
         result.setData(clients);
         return result;
     }
@@ -97,15 +92,15 @@ public class MainController
 
         try
         {
-            Client client = new Client();
-            client.setState(1);
-            client.setName(name);
-            client.setLastActiveTime(0);
-            client.setIp(null);
-            client.setAccesstoken(NonceStr.generate(64));
-            clientDAO.save(client);
+            Host host = new Host();
+            host.setState(1);
+            host.setName(name);
+            host.setLastActiveTime(0);
+            host.setIp(null);
+            host.setAccesstoken(NonceStr.generate(64));
+            hostDAO.save(host);
 
-            result.setData(client);
+            result.setData(host);
         }
         catch(Exception e)
         {
@@ -121,11 +116,11 @@ public class MainController
         Result result = new Result();
         try
         {
-            Client client = clientDAO.getById(id);
-            if (null == client) throw new RuntimeException("无此主机");
+            Host host = hostDAO.getById(id);
+            if (null == host) throw new RuntimeException("无此主机");
 
-            client.setAccesstoken(NonceStr.generate(64));
-            clientDAO.update(client);
+            host.setAccesstoken(NonceStr.generate(64));
+            hostDAO.update(host);
         }
         catch(Exception e)
         {
@@ -141,11 +136,11 @@ public class MainController
         Result result = new Result();
         try
         {
-            Client host = clientDAO.getById(id);
+            Host host = hostDAO.getById(id);
             if (null == host) throw new RuntimeException("无此主机");
 
             host.setName(name);
-            clientDAO.update(host);
+            hostDAO.update(host);
         }
         catch(Exception e)
         {
@@ -162,7 +157,7 @@ public class MainController
 
         try
         {
-            clientDAO.delete(id);
+            hostDAO.delete(id);
         }
         catch(Exception e)
         {

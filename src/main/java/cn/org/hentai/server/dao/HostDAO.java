@@ -1,6 +1,6 @@
 package cn.org.hentai.server.dao;
 
-import cn.org.hentai.server.model.Client;
+import cn.org.hentai.server.model.Host;
 import cn.org.hentai.server.util.db.DBAccess;
 import org.springframework.stereotype.Repository;
 
@@ -10,16 +10,16 @@ import java.util.List;
  * Created by Expect on 2017/12/27.
  */
 @Repository
-public class ClientDAO extends DBAccess
+public class HostDAO extends DBAccess
 {
-    public Client getById(int id)
+    public Host getById(int id)
     {
-        return select().byId(id).query(Client.class);
+        return select().byId(id).query(Host.class);
     }
 
-    public long update(Client client)
+    public long update(Host host)
     {
-        return update().valueWith(client).byId().execute();
+        return update().valueWith(host).byId().execute();
     }
 
     public long delete(long id)
@@ -27,18 +27,18 @@ public class ClientDAO extends DBAccess
         return execute("delete from clients where id = ?", id);
     }
 
-    public int save(Client client)
+    public int save(Host host)
     {
-        int id = insertInto().valueWith(client).save();
-        client.setId(id);
+        int id = insertInto().valueWith(host).save();
+        host.setId(id);
         return id;
     }
 
-    public List<Client> find(int pageIndex, int pageSize)
+    public List<Host> find(int pageIndex, int pageSize)
     {
         return select()
                 .orderBy("id", "desc")
-                .queryForPaginate(Client.class, pageIndex, pageSize);
+                .queryForPaginate(Host.class, pageIndex, pageSize);
     }
 
     public long findCount()
@@ -55,6 +55,6 @@ public class ClientDAO extends DBAccess
     @Override
     public String configureTableName()
     {
-        return "clients";
+        return "hosts";
     }
 }

@@ -12,7 +12,7 @@ public class Configs
     static {
         try
         {
-            properties.load(Configs.class.getResourceAsStream("/config/app.properties"));
+            properties.load(Configs.class.getResourceAsStream("/application.properties"));
         }
         catch (IOException e)
         {
