@@ -1,30 +1,17 @@
-package cn.org.hentai.server.app;
+package cn.org.hentai.server.core;
 
-import cn.org.hentai.protocol.Session;
+import cn.org.hentai.util.ByteUtils;
 
 import java.io.ByteArrayOutputStream;
-import java.net.Socket;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * Created by matrixy on 2017/12/29.
+ * Created by matrixy on 2018/1/5.
  */
-public class CommandCommSession extends Session
+public final class Datagram
 {
-    public CommandCommSession(Socket socket) throws Exception
-    {
-        super(socket);
-    }
-
-    @Override
-    protected void process() throws Exception
-    {
-        // 1. 有没有下发的任务？
-        // 2. 要不要下发心跳包？
-
-    }
-
-    @Override
-    protected byte[] readPacket() throws Exception
+    public static byte[] read(InputStream reader) throws IOException
     {
         ByteArrayOutputStream buff = new ByteArrayOutputStream(512);
         int buffByteCount = reader.available();
