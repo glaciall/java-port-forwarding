@@ -119,4 +119,12 @@ public final class ByteUtils
 
         new FileOutputStream("d:\\fuck3.dat").write(data);
     }
+
+    public static byte[] concat(byte[] bytes, byte[] data)
+    {
+        byte[] buff = new byte[bytes.length + data.length];
+        System.arraycopy(bytes, 0, buff, 0, bytes.length);
+        System.arraycopy(data, 0, buff, bytes.length, data.length);
+        return buff;
+    }
 }

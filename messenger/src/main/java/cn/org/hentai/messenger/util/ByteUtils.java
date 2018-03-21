@@ -86,6 +86,14 @@ public final class ByteUtils
         return ((data[pos / 8] >> (pos % 8)) & 0x01) == 0x01;
     }
 
+    public static byte[] concat(byte[] bytes, byte[] data)
+    {
+        byte[] buff = new byte[bytes.length + data.length];
+        System.arraycopy(bytes, 0, buff, 0, bytes.length);
+        System.arraycopy(data, 0, buff, bytes.length, data.length);
+        return buff;
+    }
+
     public static void main(String[] args) throws Exception
     {
         System.out.println(Integer.toHexString(ByteUtils.reverse((0x41fa3be1))));
