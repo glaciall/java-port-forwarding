@@ -1,4 +1,4 @@
-package cn.org.hentai.server.proxy;
+package cn.org.hentai.server.proxy.forward;
 
 import cn.org.hentai.server.model.Port;
 import cn.org.hentai.server.util.Log;

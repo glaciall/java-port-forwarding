@@ -1,4 +1,4 @@
-package cn.org.hentai.server.proxy;
+package cn.org.hentai.server.proxy.commander;
 
 import cn.org.hentai.server.model.Host;
 import cn.org.hentai.server.util.Configs;
@@ -22,9 +22,9 @@ public class CommandServer implements Runnable
         ServerSocket server = null;
         try
         {
-            listenPort = Configs.getInt("command.server.port", 9999);
+            listenPort = Configs.getInt("server.command.port", 1212);
             server = new ServerSocket(listenPort, 1000, InetAddress.getByName("0.0.0.0"));
-            Log.debug("Command Server started...");
+            Log.debug("Command Server started on: " + listenPort);
             while (true)
             {
                 Socket client = server.accept();

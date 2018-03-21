@@ -1,6 +1,6 @@
 package cn.org.hentai.server.app;
 
-import cn.org.hentai.server.proxy.CommandServer;
+import cn.org.hentai.server.proxy.commander.CommandServer;
 import cn.org.hentai.server.util.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;

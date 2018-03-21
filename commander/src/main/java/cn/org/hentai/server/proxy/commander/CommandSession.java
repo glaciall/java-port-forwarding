@@ -1,12 +1,13 @@
-package cn.org.hentai.server.proxy;
+package cn.org.hentai.server.proxy.commander;
 
 import cn.org.hentai.server.dao.HostDAO;
 import cn.org.hentai.server.model.Host;
+import cn.org.hentai.server.proxy.Constants;
+import cn.org.hentai.server.proxy.Packet;
+import cn.org.hentai.server.proxy.SocketSession;
 import cn.org.hentai.server.proxy.command.Command;
-import cn.org.hentai.server.util.BeanUtils;
-import cn.org.hentai.server.util.Log;
-import cn.org.hentai.server.util.NonceStr;
-import cn.org.hentai.server.util.ByteUtils;
+import cn.org.hentai.server.proxy.commander.CommandServer;
+import cn.org.hentai.server.util.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,6 +40,7 @@ public class CommandSession extends SocketSession
         // 先读取一个包，确定一下主机端的身份
         host = authenticate(inputStream, outputStream);
         CommandServer.register(host, this);
+        Log.debug("Host: " + host.getName() + " connected...");
 
         while (true)
         {
@@ -74,12 +76,13 @@ public class CommandSession extends SocketSession
      */
     private void testConnection(InputStream inputStream, OutputStream outputStream) throws Exception
     {
-        if (System.currentTimeMillis() - lastActiveTime < 1000 * 10) return;
+        int timeout = Configs.getInt("server.test-packet.timeout", 1000 * 30);
+        if (System.currentTimeMillis() - lastActiveTime < timeout) return;
         byte[] data = NonceStr.generate(32).getBytes();
         byte[] packet = Packet.create(host.getId(), Constants.ENCRYPT_TYPE_DES, Constants.COMMAND_TEST_CONNECTION, data, host.getAccesstoken());
         outputStream.write(packet);
-        Packet.read(inputStream);
-        // lastActiveTime = System.currentTimeMillis();
+        Packet.read(inputStream, true);
+        lastActiveTime = System.currentTimeMillis();
     }
 
     /**
@@ -92,12 +95,11 @@ public class CommandSession extends SocketSession
     private Host authenticate(InputStream inputStream, OutputStream outputStream) throws Exception
     {
         byte[] packet = Packet.read(inputStream, true);
-        System.out.println("Test XXXX");
-        Log.debug("Recv: " + ByteUtils.toString(packet));
         int hostId = Packet.getHostId(packet);
         Host host = hostDAO.getById(hostId);
         if (null == host) throw new RuntimeException("no such host: " + hostId);
-        Packet.getData(packet, host.getAccesstoken());
+        byte[] decrypted = Packet.getData(packet, host.getAccesstoken());
+        if (!"authenticate".equals(new String(decrypted))) throw new RuntimeException("invalid authenticate packet: " + ByteUtils.toString(packet));
         outputStream.write(Packet.create(hostId, Constants.ENCRYPT_TYPE_DES, Constants.COMMAND_AUTHENTICATION, NonceStr.generate(32).getBytes(), host.getAccesstoken()));
         return host;
     }

@@ -1,8 +1,9 @@
-package cn.org.hentai.server.proxy;
+package cn.org.hentai.server.proxy.forward;
 
 import cn.org.hentai.server.dao.HostDAO;
 import cn.org.hentai.server.dao.PortDAO;
 import cn.org.hentai.server.model.Port;
+import cn.org.hentai.server.proxy.SocketSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;

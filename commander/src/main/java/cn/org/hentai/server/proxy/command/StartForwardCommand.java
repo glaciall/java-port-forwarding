@@ -27,7 +27,6 @@ public class StartForwardCommand extends Command
     public byte[] getBytes()
     {
         byte[] data = authcode.getBytes();
-        // return ByteUtils.concat(ByteUtils.toBytes(serverPort), data);
-        return null;
+        return ByteUtils.concat(ByteUtils.toBytes(serverPort), data);
     }
 }
