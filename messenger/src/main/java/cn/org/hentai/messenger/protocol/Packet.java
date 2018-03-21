@@ -1,8 +1,9 @@
-package cn.org.hentai.server.proxy;
+package cn.org.hentai.messenger.protocol;
 
-import cn.org.hentai.server.proxy.command.Command;
-import cn.org.hentai.server.util.ByteUtils;
-import cn.org.hentai.server.util.DES;
+import cn.org.hentai.messenger.protocol.command.Command;
+import cn.org.hentai.messenger.util.ByteUtils;
+import cn.org.hentai.messenger.util.DES;
+import cn.org.hentai.messenger.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -12,6 +13,9 @@ import java.io.InputStream;
  */
 public final class Packet
 {
+    public static final int ENCRYPT_TYPE_NONE = 0x00;       // 数据体不加密
+    public static final int ENCRYPT_TYPE_DES = 0x01;        // 数据体通过DES加密
+
     // 读取一整个包
     public static byte[] read(InputStream reader) throws Exception
     {
@@ -21,7 +25,10 @@ public final class Packet
     public static byte[] read(InputStream reader, boolean wait) throws Exception
     {
         ByteArrayOutputStream buff = new ByteArrayOutputStream(512);
-        while (wait && reader.available() < 13) Thread.sleep(10);
+        while (wait && reader.available() < 13)
+        {
+            Thread.sleep(10);
+        }
         if (reader.available() < 13) return null;
         byte[] data = new byte[13];
 
@@ -43,6 +50,15 @@ public final class Packet
         return buff.toByteArray();
     }
 
+    /**
+     * 创建数据包
+     * @param hostId 主机ID
+     * @param encryptType 加密类型
+     * @param command 指令
+     * @param accesstoken 通信令牌
+     * @return 数据包
+     * @throws Exception
+     */
     public static byte[] create(int hostId, int encryptType, Command command, String accesstoken) throws Exception
     {
         return create(hostId, encryptType, command.getCode(), command.getBytes(), accesstoken);
@@ -55,6 +71,17 @@ public final class Packet
     * 00 00 指令，最高2位用于描述加密类型，01表示AES加密
     * ...... AES加密后的数据体
     */
+
+    /**
+     * 手工创建数据包
+     * @param hostId 主机ID
+     * @param encryptType 加密类型
+     * @param command 指令
+     * @param data 指令数据
+     * @param accesstoken 通信令牌
+     * @return 数据包
+     * @throws Exception
+     */
     public static byte[] create(int hostId, int encryptType, int command, byte[] data, String accesstoken) throws Exception
     {
         byte[] encryptedData = null;
@@ -119,5 +146,8 @@ public final class Packet
         System.out.println("HostId : " + getHostId(packet));
         System.out.println("Command: " + getCommand(packet));
         System.out.println("Data   : " + ByteUtils.toString(getData(packet, accesstoken)));
+
+        packet = ByteUtils.parse("FA FA FA 00 00 00 18 00 00 00 01 40 01 42 20 08 B5 FE B4 21 39 C3 CB DB 66 E4 CB 5E 18 C7 66 DE 6C 39 51 73 E3");
+        System.out.println(new String(getData(packet, "P4VsorRywQfzVjjYhPeFE8TLHInICqJgZlx7WaeQcr96cxWa5o1rKf38gy76G8FF")));
     }
 }
