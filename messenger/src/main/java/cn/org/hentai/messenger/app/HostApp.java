@@ -1,6 +1,6 @@
 package cn.org.hentai.messenger.app;
 
-import cn.org.hentai.messenger.worker.CommandListener;
+import cn.org.hentai.messenger.protocol.CommandListener;
 
 /**
  * Created by matrixy on 2018/3/21.

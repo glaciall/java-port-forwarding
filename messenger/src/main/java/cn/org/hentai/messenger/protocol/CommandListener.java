@@ -1,4 +1,4 @@
-package cn.org.hentai.messenger.worker;
+package cn.org.hentai.messenger.protocol;
 
 import cn.org.hentai.messenger.protocol.ForwardWorker;
 import cn.org.hentai.messenger.protocol.Packet;

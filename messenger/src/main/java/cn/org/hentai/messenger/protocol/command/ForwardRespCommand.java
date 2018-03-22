@@ -13,6 +13,6 @@ public class ForwardRespCommand extends Command
     @Override
     public byte[] getBytes()
     {
-        return "forward".getBytes();
+        return "proxy".getBytes();
     }
 }
