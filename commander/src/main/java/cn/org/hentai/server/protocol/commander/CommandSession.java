@@ -1,12 +1,11 @@
-package cn.org.hentai.server.proxy.commander;
+package cn.org.hentai.server.protocol.commander;
 
 import cn.org.hentai.server.dao.HostDAO;
 import cn.org.hentai.server.model.Host;
-import cn.org.hentai.server.proxy.Constants;
-import cn.org.hentai.server.proxy.Packet;
-import cn.org.hentai.server.proxy.SocketSession;
-import cn.org.hentai.server.proxy.command.Command;
-import cn.org.hentai.server.proxy.commander.CommandServer;
+import cn.org.hentai.server.protocol.Constants;
+import cn.org.hentai.server.protocol.Packet;
+import cn.org.hentai.server.protocol.SocketSession;
+import cn.org.hentai.server.protocol.command.Command;
 import cn.org.hentai.server.util.*;
 
 import java.io.InputStream;

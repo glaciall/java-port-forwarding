@@ -1,4 +1,4 @@
-package cn.org.hentai.server.proxy;
+package cn.org.hentai.server.protocol;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 

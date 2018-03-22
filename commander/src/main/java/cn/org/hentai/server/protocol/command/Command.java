@@ -1,4 +1,4 @@
-package cn.org.hentai.server.proxy.command;
+package cn.org.hentai.server.protocol.command;
 
 /**
  * Created by Expect on 2018/3/5.

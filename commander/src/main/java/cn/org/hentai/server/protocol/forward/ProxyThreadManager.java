@@ -1,4 +1,4 @@
-package cn.org.hentai.server.proxy.forward;
+package cn.org.hentai.server.protocol.forward;
 
 import cn.org.hentai.server.dao.PortDAO;
 import cn.org.hentai.server.model.Port;

@@ -1,4 +1,4 @@
-package cn.org.hentai.server.proxy.command;
+package cn.org.hentai.server.protocol.command;
 
 import cn.org.hentai.server.util.ByteUtils;
 
