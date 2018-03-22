@@ -1,6 +1,9 @@
 package cn.org.hentai.server.app;
 
 import cn.org.hentai.server.protocol.commander.CommandServer;
+import cn.org.hentai.server.protocol.host.HostForwardServer;
+import cn.org.hentai.server.protocol.proxy.ProxyServer;
+import cn.org.hentai.server.protocol.proxy.ProxyThreadManager;
 import cn.org.hentai.server.util.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -30,8 +33,8 @@ public class ServerApp
         ApplicationContext context = SpringApplication.run(ServerApp.class, args);
         BeanUtils.init(context);
         new Thread(new CommandServer()).start();
-        // new Thread(new ForwardServer()).start();
-        // ProxyThreadManager.init().load(context);
+        new Thread(new HostForwardServer()).start();
+        ProxyThreadManager.init().load(context);
     }
 
     @Bean

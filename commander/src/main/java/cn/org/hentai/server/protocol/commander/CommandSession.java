@@ -2,10 +2,11 @@ package cn.org.hentai.server.protocol.commander;
 
 import cn.org.hentai.server.dao.HostDAO;
 import cn.org.hentai.server.model.Host;
-import cn.org.hentai.server.protocol.Constants;
+import cn.org.hentai.server.model.Port;
 import cn.org.hentai.server.protocol.Packet;
 import cn.org.hentai.server.protocol.SocketSession;
 import cn.org.hentai.server.protocol.command.Command;
+import cn.org.hentai.server.protocol.command.StartForwardCommand;
 import cn.org.hentai.server.util.*;
 
 import java.io.InputStream;
@@ -20,25 +21,25 @@ public class CommandSession extends SocketSession
 {
     HostDAO hostDAO;
     Host host = null;
-    Socket client = null;
+    Socket connection = null;
     long lastActiveTime = System.currentTimeMillis();
     LinkedList<Command> commands = new LinkedList<Command>();                     // 待下发的指令
 
-    public CommandSession(Socket client)
+    public CommandSession(Socket connection)
     {
-        this.client = client;
+        this.connection = connection;
         hostDAO = BeanUtils.create(HostDAO.class);
     }
 
     @Override
     protected void converse() throws Exception
     {
-        InputStream inputStream = this.client.getInputStream();
-        OutputStream outputStream = this.client.getOutputStream();
+        InputStream inputStream = this.connection.getInputStream();
+        OutputStream outputStream = this.connection.getOutputStream();
 
         // 先读取一个包，确定一下主机端的身份
         host = authenticate(inputStream, outputStream);
-        CommandServer.register(host, this);
+        HostConnectionManager.getInstance().register(host.getId(), this);
         Log.debug("Host: " + host.getName() + " connected...");
 
         while (true)
@@ -60,9 +61,10 @@ public class CommandSession extends SocketSession
      */
     private void sendCommand(InputStream inputStream, OutputStream outputStream) throws Exception
     {
-        Command cmd = commands.peekFirst();
+        if (commands.size() == 0) return;
+        Command cmd = commands.removeFirst();
         if (null == cmd) return;
-        byte[] packet = Packet.create(host.getId(), Constants.ENCRYPT_TYPE_DES, cmd.getCode(), cmd.getBytes(), host.getAccesstoken());
+        byte[] packet = Packet.create(host.getId(), Packet.ENCRYPT_TYPE_DES, cmd.getCode(), cmd.getBytes(), host.getAccesstoken());
         outputStream.write(packet);
         Packet.read(inputStream);
         lastActiveTime = System.currentTimeMillis();
@@ -78,7 +80,7 @@ public class CommandSession extends SocketSession
         int timeout = Configs.getInt("server.test-packet.timeout", 1000 * 30);
         if (System.currentTimeMillis() - lastActiveTime < timeout) return;
         byte[] data = NonceStr.generate(32).getBytes();
-        byte[] packet = Packet.create(host.getId(), Constants.ENCRYPT_TYPE_DES, Constants.COMMAND_TEST_CONNECTION, data, host.getAccesstoken());
+        byte[] packet = Packet.create(host.getId(), Packet.ENCRYPT_TYPE_DES, Command.CODE_TEST, data, host.getAccesstoken());
         outputStream.write(packet);
         Packet.read(inputStream, true);
         lastActiveTime = System.currentTimeMillis();
@@ -99,14 +101,19 @@ public class CommandSession extends SocketSession
         if (null == host) throw new RuntimeException("no such host: " + hostId);
         byte[] decrypted = Packet.getData(packet, host.getAccesstoken());
         if (!"authenticate".equals(new String(decrypted))) throw new RuntimeException("invalid authenticate packet: " + ByteUtils.toString(packet));
-        outputStream.write(Packet.create(hostId, Constants.ENCRYPT_TYPE_DES, Constants.COMMAND_AUTHENTICATION, NonceStr.generate(32).getBytes(), host.getAccesstoken()));
+        outputStream.write(Packet.create(hostId, Packet.ENCRYPT_TYPE_DES, Command.CODE_AUTHENTICATE, NonceStr.generate(32).getBytes(), host.getAccesstoken()));
         return host;
     }
 
     @Override
     protected void release()
     {
-        try { this.client.close(); } catch(Exception e) { }
-        try { CommandServer.release(host); } catch(Exception e) { }
+        try { this.connection.close(); } catch(Exception e) { }
+        try { HostConnectionManager.getInstance().unregister(host.getId()); } catch(Exception e) { }
+    }
+
+    public synchronized void requestForward(int seqId, Port port)
+    {
+        commands.add(new StartForwardCommand(seqId, port.getHostPort()));
     }
 }

@@ -1,12 +1,13 @@
 package cn.org.hentai.messenger.protocol;
 
+import cn.org.hentai.messenger.util.ByteUtils;
 import cn.org.hentai.messenger.util.Configs;
 import cn.org.hentai.messenger.util.Log;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
@@ -16,13 +17,13 @@ import java.net.Socket;
 public class ForwardWorker implements Runnable
 {
     // 服务器端给出的连接请求流水号
-    private int seqId = 0;
+    private int sequenceId = 0;
     // 服务器端给出的需要转发的TCP端口号
     private int port = 0;
 
     public ForwardWorker(int forwardSeqId, int port)
     {
-        this.seqId = forwardSeqId;
+        this.sequenceId = forwardSeqId;
         this.port = port;
     }
 
@@ -30,9 +31,9 @@ public class ForwardWorker implements Runnable
     private void forward() throws Exception
     {
         // TODO: 数据包缓冲区的大小自动调整
-        byte[] localBuf = new byte[4096];
-        byte[] serverBuf = new byte[4096];
-        Socket server = new Socket(Configs.get("server.addr"), Configs.getInt("server.forward.port", 1111));
+        byte[] localBuf = new byte[40960];
+        byte[] serverBuf = new byte[40960];
+        Socket server = new Socket(Configs.get("server.addr"), Configs.getInt("server.forward.port", 11221));
         Socket local = new Socket(InetAddress.getByName("localhost"), this.port);
         server.setSoTimeout(1000 * 60);
         local.setSoTimeout(1000 * 60);
@@ -40,19 +41,28 @@ public class ForwardWorker implements Runnable
         OutputStream serverOs = server.getOutputStream(), localOs = local.getOutputStream();
         try
         {
+            // 先发送4字节的流水号
+            serverOs.write(ByteUtils.toBytes(this.sequenceId));
+            serverOs.flush();
+
+            // 开始转发
             while (true)
             {
                 int localBufLength = localIs.available();
                 int serverBufLength = serverIs.available();
                 if (localBufLength > 0)
                 {
-                    localIs.read(localBuf, 0, localBufLength);
-                    serverOs.write(localBuf, 0, localBufLength);
+                    // localIs.read(localBuf, 0, localBufLength);
+                    // serverOs.write(localBuf, 0, localBufLength);
+                    // serverOs.flush();
+                    transfer(localIs, serverOs, localBufLength);
                 }
                 if (serverBufLength > 0)
                 {
-                    serverIs.read(serverBuf, 0, serverBufLength);
-                    localOs.write(serverBuf, 0, serverBufLength);
+                    // serverIs.read(serverBuf, 0, serverBufLength);
+                    // localOs.write(serverBuf, 0, serverBufLength);
+                    // localOs.flush();
+                    transfer(serverIs, localOs, serverBufLength);
                 }
             }
         }
@@ -65,6 +75,19 @@ public class ForwardWorker implements Runnable
             try { server.close(); } catch(Exception e) {}
             try { local.close(); } catch(Exception e) {}
         }
+    }
+
+    // 数据包的转发
+    private void transfer(InputStream from, OutputStream to, int byteCount) throws IOException
+    {
+        int len = 4096;
+        byte[] buf = new byte[4096];
+        for (int i = 0; i < byteCount; i += len)
+        {
+            len = from.read(buf, 0, Math.min(4096, byteCount - i));
+            to.write(buf, 0, len);
+        }
+        to.flush();
     }
 
     public void run()

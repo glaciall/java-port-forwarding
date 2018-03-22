@@ -37,20 +37,4 @@ public class CommandServer implements Runnable
             Log.error(e);
         }
     }
-
-    protected static ConcurrentMap<Integer, CommandSession> hostSessions = new ConcurrentHashMap<Integer, CommandSession>();
-    protected static CommandSession getSession(int hostId)
-    {
-        return hostSessions.get(hostId);
-    }
-
-    protected static void register(Host host, CommandSession session)
-    {
-        hostSessions.put(host.getId(), session);
-    }
-
-    protected static void release(Host host)
-    {
-        hostSessions.remove(host.getId());
-    }
 }

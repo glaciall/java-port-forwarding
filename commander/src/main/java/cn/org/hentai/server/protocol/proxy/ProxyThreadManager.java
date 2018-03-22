@@ -1,4 +1,4 @@
-package cn.org.hentai.server.protocol.forward;
+package cn.org.hentai.server.protocol.proxy;
 
 import cn.org.hentai.server.dao.PortDAO;
 import cn.org.hentai.server.model.Port;
@@ -40,11 +40,15 @@ public final class ProxyThreadManager
      */
     public void start(Port port)
     {
-        Thread thread = threads.get(port.getListenPort());
+        Thread thread = null;
+        synchronized (threads)
+        {
+            thread = threads.get(port.getListenPort());
+        }
         if (thread != null && thread.getState() != Thread.State.TERMINATED) throw new RuntimeException("代理转发服务不能重复启动");
-        new Thread(new ProxyServer(port));
+        thread = new Thread(new ProxyServer(port));
         threads.put(port.getListenPort(), thread);
-        Log.debug("Proxy[" + port.getListenPort() + " <---> " + port.getHostPort() + " ] started...");
+        thread.start();
     }
 
     /**
@@ -53,7 +57,11 @@ public final class ProxyThreadManager
      */
     public void stop(Port port)
     {
-        Thread thread = threads.get(port.getListenPort());
+        Thread thread = null;
+        synchronized (threads)
+        {
+            thread = threads.get(port.getListenPort());
+        }
         if (thread != null) throw new RuntimeException("转发服务未启动");
         try
         {

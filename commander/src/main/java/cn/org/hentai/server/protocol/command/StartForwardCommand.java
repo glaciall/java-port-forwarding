@@ -7,26 +7,23 @@ import cn.org.hentai.server.util.ByteUtils;
  */
 public class StartForwardCommand extends Command
 {
-    // 主机端应该连接到哪个端口来
-    private int serverPort;
-
-    // 连接到服务器端时的校验字符串
-    private String authcode;
-
-    public void setAuthcode(String authcode)
+    int sequenceId = 0;
+    int hostPort = 0;
+    public StartForwardCommand(int sequenceId, int hostPort)
     {
-        this.authcode = authcode;
-    }
-
-    public String getAuthcode()
-    {
-        return this.authcode;
+        this.setCode(Command.CODE_START_FORWARD);
+        this.sequenceId = sequenceId;
+        this.hostPort = hostPort;
     }
 
     @Override
     public byte[] getBytes()
     {
-        byte[] data = authcode.getBytes();
-        return ByteUtils.concat(ByteUtils.toBytes(serverPort), data);
+        // 4字节序号
+        // 4字节端口号
+        byte[] data = new byte[8];
+        System.arraycopy(ByteUtils.toBytes(this.sequenceId), 0, data, 0, 4);
+        System.arraycopy(ByteUtils.toBytes(this.hostPort), 0, data, 4, 4);
+        return data;
     }
 }

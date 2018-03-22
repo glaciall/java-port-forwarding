@@ -12,6 +12,9 @@ import java.io.InputStream;
  */
 public final class Packet
 {
+    public static final int ENCRYPT_TYPE_NONE = 0x00;       // 数据体不加密
+    public static final int ENCRYPT_TYPE_DES = 0x01;        // 数据体通过DES加密
+
     // 读取一整个包
     public static byte[] read(InputStream reader) throws Exception
     {

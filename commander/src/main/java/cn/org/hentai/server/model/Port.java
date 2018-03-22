@@ -11,6 +11,9 @@ public class Port
     // 所属用户ID
     private int userId;
 
+    // 所属主机ID
+    private int hostId;
+
     // 服务器端监听端口
     private int listenPort;
 
@@ -34,6 +37,14 @@ public class Port
 
     // 连接超时
     private int connectTimeout;
+
+    public int getHostId() {
+        return hostId;
+    }
+
+    public void setHostId(int hostId) {
+        this.hostId = hostId;
+    }
 
     public int getConnectTimeout()
     {
@@ -136,11 +147,11 @@ public class Port
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "Port{" +
                 "id=" + id +
                 ", userId=" + userId +
+                ", hostId=" + hostId +
                 ", listenPort=" + listenPort +
                 ", hostPort=" + hostPort +
                 ", state=" + state +
@@ -148,6 +159,8 @@ public class Port
                 ", lastActiveTime=" + lastActiveTime +
                 ", soTimeout=" + soTimeout +
                 ", concurrentConnections=" + concurrentConnections +
+                ", connectTimeout=" + connectTimeout +
                 '}';
     }
+
 }

@@ -27,7 +27,9 @@ public class PortDAO extends DBAccess
     @Override
     public String[] configureFields()
     {
-        return new String[] { "id", "user_id", "host_id", "listen_port", "connect_timeout", "host_port", "state", "create_time", "last_active_time", "so_timeout", "concurrent_connections" };
+        return new String[] { "id", "user_id", "host_id", "listen_port",
+                "connect_timeout", "host_port", "state", "create_time",
+                "last_active_time", "so_timeout", "concurrent_connections" };
     }
 
     @Override
