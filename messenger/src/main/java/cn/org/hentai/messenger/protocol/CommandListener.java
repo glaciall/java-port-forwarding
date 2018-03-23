@@ -69,7 +69,9 @@ public class CommandListener implements Runnable
                 byte[] data = Packet.getData(resp, accessToken);
                 int seqId = ByteUtils.getInt(data, 0, 4);
                 int port = ByteUtils.getInt(data, 4, 4);
-                new Thread(new ForwardWorker(seqId, port)).start();
+                ForwardWorker worker = new ForwardWorker(seqId, port);
+                SessionManager.getInstance().register(worker);
+                worker.start();
                 outputStream.write(Packet.create(hostId, Packet.ENCRYPT_TYPE_DES, new ForwardRespCommand(), accessToken));
             }
         }

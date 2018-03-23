@@ -2,7 +2,7 @@ package cn.org.hentai.server.app;
 
 import cn.org.hentai.server.protocol.commander.CommandServer;
 import cn.org.hentai.server.protocol.host.HostForwardServer;
-import cn.org.hentai.server.protocol.proxy.ProxyServer;
+import cn.org.hentai.server.protocol.SocketSessionManager;
 import cn.org.hentai.server.protocol.proxy.ProxyThreadManager;
 import cn.org.hentai.server.util.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,7 @@ public class ServerApp
         BeanUtils.init(context);
         new Thread(new CommandServer()).start();
         new Thread(new HostForwardServer()).start();
+        SocketSessionManager.getInstance().startTimeoutMonitor();
         ProxyThreadManager.init().load(context);
     }
 

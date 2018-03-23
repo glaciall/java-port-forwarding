@@ -1,5 +1,6 @@
 package cn.org.hentai.server.protocol.host;
 
+import cn.org.hentai.server.protocol.SocketSessionManager;
 import cn.org.hentai.server.util.Configs;
 import cn.org.hentai.server.util.Log;
 
@@ -19,7 +20,9 @@ public class HostForwardServer implements Runnable
         while (true)
         {
             Socket hostConnection = server.accept();
-            new Thread(new ForwardSession(hostConnection)).start();
+            ForwardSession session = new ForwardSession(hostConnection);
+            SocketSessionManager.getInstance().register(session);
+            session.start();
         }
     }
 

@@ -1,5 +1,6 @@
 package cn.org.hentai.server.protocol.host;
 
+import cn.org.hentai.server.protocol.SocketSession;
 import cn.org.hentai.server.protocol.commander.HostConnectionManager;
 import cn.org.hentai.server.util.ByteUtils;
 import cn.org.hentai.server.util.Configs;
@@ -12,12 +13,23 @@ import java.net.Socket;
 /**
  * Created by matrixy on 2018/3/22.
  */
-public class ForwardSession implements Runnable
+public class ForwardSession extends SocketSession
 {
     private Socket hostConnection;
     public ForwardSession(Socket hostConnection)
     {
         this.hostConnection = hostConnection;
+    }
+
+    @Override
+    public boolean timedout()
+    {
+        try
+        {
+            if (this.hostConnection.isClosed()) return true;
+        }
+        catch(Exception e) { }
+        return false;
     }
 
     public void run()
@@ -36,5 +48,17 @@ public class ForwardSession implements Runnable
         {
             Log.error(e);
         }
+    }
+
+    @Override
+    protected void converse() throws Exception
+    {
+        // ...
+    }
+
+    @Override
+    protected void release()
+    {
+        // ...
     }
 }

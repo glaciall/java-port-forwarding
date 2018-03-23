@@ -23,12 +23,14 @@ public class CommandSession extends SocketSession
     Host host = null;
     Socket connection = null;
     long lastActiveTime = System.currentTimeMillis();
+    int testTimeout = 0;
     LinkedList<Command> commands = new LinkedList<Command>();                     // 待下发的指令
 
     public CommandSession(Socket connection)
     {
         this.connection = connection;
         hostDAO = BeanUtils.create(HostDAO.class);
+        testTimeout = Configs.getInt("server.test-packet.timeout", 1000 * 30);
     }
 
     @Override
@@ -54,6 +56,12 @@ public class CommandSession extends SocketSession
         }
     }
 
+    @Override
+    public boolean timedout()
+    {
+        return System.currentTimeMillis() - lastActiveTime > testTimeout;
+    }
+
     /**
      * 下发指令，一次只下发一个指令
      * @param inputStream
@@ -66,6 +74,7 @@ public class CommandSession extends SocketSession
         if (null == cmd) return;
         byte[] packet = Packet.create(host.getId(), Packet.ENCRYPT_TYPE_DES, cmd.getCode(), cmd.getBytes(), host.getAccesstoken());
         outputStream.write(packet);
+        outputStream.flush();
         Packet.read(inputStream);
         lastActiveTime = System.currentTimeMillis();
     }
@@ -77,11 +86,11 @@ public class CommandSession extends SocketSession
      */
     private void testConnection(InputStream inputStream, OutputStream outputStream) throws Exception
     {
-        int timeout = Configs.getInt("server.test-packet.timeout", 1000 * 30);
-        if (System.currentTimeMillis() - lastActiveTime < timeout) return;
+        if (System.currentTimeMillis() - lastActiveTime < testTimeout) return;
         byte[] data = NonceStr.generate(32).getBytes();
         byte[] packet = Packet.create(host.getId(), Packet.ENCRYPT_TYPE_DES, Command.CODE_TEST, data, host.getAccesstoken());
         outputStream.write(packet);
+        outputStream.flush();
         Packet.read(inputStream, true);
         lastActiveTime = System.currentTimeMillis();
     }
@@ -102,6 +111,7 @@ public class CommandSession extends SocketSession
         byte[] decrypted = Packet.getData(packet, host.getAccesstoken());
         if (!"authenticate".equals(new String(decrypted))) throw new RuntimeException("invalid authenticate packet: " + ByteUtils.toString(packet));
         outputStream.write(Packet.create(hostId, Packet.ENCRYPT_TYPE_DES, Command.CODE_AUTHENTICATE, NonceStr.generate(32).getBytes(), host.getAccesstoken()));
+        outputStream.flush();
         return host;
     }
 
@@ -109,7 +119,8 @@ public class CommandSession extends SocketSession
     protected void release()
     {
         try { this.connection.close(); } catch(Exception e) { }
-        try { HostConnectionManager.getInstance().unregister(host.getId()); } catch(Exception e) { }
+        try { HostConnectionManager.getInstance().unregister(this); } catch(Exception e) { }
+        super.release();
     }
 
     public synchronized void requestForward(int seqId, Port port)

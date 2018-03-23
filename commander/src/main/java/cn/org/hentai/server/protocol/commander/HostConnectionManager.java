@@ -24,7 +24,7 @@ public class HostConnectionManager
     public void register(int hostId, CommandSession session)
     {
         Log.debug("Register: " + hostId);
-        if (hostSessions.containsKey(hostId)) throw new RuntimeException("主机端己连接");
+        // if (hostSessions.containsKey(hostId)) throw new RuntimeException("主机端己连接");
         synchronized (hostSessions)
         {
             hostSessions.put(hostId, session);
@@ -32,12 +32,11 @@ public class HostConnectionManager
     }
 
     // 主机端的连接断开时取消注册
-    public CommandSession unregister(int hostId)
+    public void unregister(CommandSession session)
     {
-        Log.debug("Unregister: " + hostId);
         synchronized (hostSessions)
         {
-            return hostSessions.remove(hostId);
+            hostSessions.remove(session);
         }
     }
 
@@ -48,6 +47,7 @@ public class HostConnectionManager
         CommandSession commandSession = null;
         synchronized (hostSessions)
         {
+            if (!hostSessions.containsKey(port.getHostId())) throw new RuntimeException("主机端尚未连接");
             commandSession = hostSessions.get(port.getHostId());
         }
         if (null == hostSessions) throw new RuntimeException("当前无提供服务的主机连接");

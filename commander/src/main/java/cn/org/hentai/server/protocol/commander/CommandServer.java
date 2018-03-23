@@ -1,6 +1,8 @@
 package cn.org.hentai.server.protocol.commander;
 
 import cn.org.hentai.server.model.Host;
+import cn.org.hentai.server.protocol.SocketSession;
+import cn.org.hentai.server.protocol.SocketSessionManager;
 import cn.org.hentai.server.util.Configs;
 import cn.org.hentai.server.util.Log;
 
@@ -29,7 +31,8 @@ public class CommandServer implements Runnable
             {
                 Socket client = server.accept();
                 CommandSession session = new CommandSession(client);
-                new Thread(session).start();
+                SocketSessionManager.getInstance().register(session);
+                session.start();
             }
         }
         catch(Exception e)

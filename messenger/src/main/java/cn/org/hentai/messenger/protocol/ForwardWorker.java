@@ -14,24 +14,44 @@ import java.net.Socket;
  * Created by matrixy on 2018/3/21.
  * 负责主机端的TCP转发服务
  */
-public class ForwardWorker implements Runnable
+public class ForwardWorker extends Thread
 {
     // 服务器端给出的连接请求流水号
     private int sequenceId = 0;
+
     // 服务器端给出的需要转发的TCP端口号
     private int port = 0;
+
+    // IO等待超时时长（毫秒）
+    private int iowaitTimeout = 30000;
+
+    // 最后交换数据包的时间
+    private long lastExchangeTime = 0;
+
+    private Socket server = null, local = null;
 
     public ForwardWorker(int forwardSeqId, int port)
     {
         this.sequenceId = forwardSeqId;
         this.port = port;
+        this.setName("Forward-" + port);
+        iowaitTimeout = Configs.getInt("timeout.iowait", 30000);
+    }
+
+    // 是否己经发生了IO等待超时
+    public boolean timedout()
+    {
+        iowaitTimeout = 5000;
+        Log.debug("Timeout test: " + ((System.currentTimeMillis() - lastExchangeTime) / 1000));
+        return System.currentTimeMillis() - lastExchangeTime > iowaitTimeout;
     }
 
     // 开始转发
     private void forward() throws Exception
     {
-        Socket server = new Socket(Configs.get("server.addr"), Configs.getInt("server.forward.port", 11221));
-        Socket local = new Socket(InetAddress.getByName("localhost"), this.port);
+        lastExchangeTime = System.currentTimeMillis();
+        server = new Socket(Configs.get("server.addr"), Configs.getInt("server.forward.port", 11221));
+        local = new Socket(InetAddress.getByName("localhost"), this.port);
         server.setSoTimeout(1000 * 60);
         local.setSoTimeout(1000 * 60);
         InputStream serverIs = server.getInputStream(), localIs = local.getInputStream();
@@ -79,6 +99,15 @@ public class ForwardWorker implements Runnable
             to.write(buf, 0, len);
         }
         to.flush();
+        lastExchangeTime = System.currentTimeMillis();
+    }
+
+    public void terminate()
+    {
+        Log.debug("Terminate: " + this.getName());
+        try { server.close(); } catch(Exception e) { }
+        try { local.close(); } catch(Exception e) { }
+        try { this.stop(); } catch(Exception e) { }
     }
 
     public void run()

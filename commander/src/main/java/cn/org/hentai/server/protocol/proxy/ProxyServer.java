@@ -1,6 +1,7 @@
 package cn.org.hentai.server.protocol.proxy;
 
 import cn.org.hentai.server.model.Port;
+import cn.org.hentai.server.protocol.SocketSessionManager;
 import cn.org.hentai.server.util.Log;
 
 import java.net.ServerSocket;
@@ -27,7 +28,9 @@ public class ProxyServer implements Runnable
             while (true)
             {
                 Socket client = server.accept();
-                new Thread(new ProxySession(port, client, this.port.getConnectTimeout())).start();
+                ProxySession session = new ProxySession(port, client, this.port.getConnectTimeout());
+                SocketSessionManager.getInstance().register(session);
+                session.start();
             }
         }
         catch(Exception e)
