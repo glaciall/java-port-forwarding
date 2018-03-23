@@ -102,8 +102,14 @@ public class VLinkedList<E>
         System.out.println("Size: " + list.size());
         list.traverse(awalker);
         System.out.println("------------------------------");
-        list.remove(d);
-        list.remove(j);
+        list.traverse(new ListAwalker<String>()
+        {
+            @Override
+            public void test(String o)
+            {
+                if ("k".equals(o)) list.remove(o);
+            }
+        });
         list.traverse(awalker);
     }
 }
