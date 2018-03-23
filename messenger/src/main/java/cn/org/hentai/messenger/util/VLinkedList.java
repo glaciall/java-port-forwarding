@@ -41,12 +41,20 @@ public class VLinkedList<E>
         {
             if (item.equals(curr.item))
             {
-                curr.prev.next = curr.next;
-                curr.next.prev = curr.prev;
+                if (curr == first) (first = curr.next).prev = null;
+                else if (curr == last) (last = curr.prev).next = null;
+                else
+                {
+                    curr.prev.next = curr.next;
+                    curr.next.prev = curr.prev;
+                }
+
+                java.util.LinkedList e;
                 break;
             }
             curr = curr.next;
         }
+        size--;
     }
 
     public void traverse(ListAwalker awalker)
@@ -73,6 +81,11 @@ public class VLinkedList<E>
             this.item = item;
             this.prev = prev;
             this.next = next;
+        }
+
+        public String toString()
+        {
+            return String.valueOf(this.item);
         }
     }
 
@@ -107,7 +120,7 @@ public class VLinkedList<E>
             @Override
             public void test(String o)
             {
-                if ("k".equals(o)) list.remove(o);
+                if ("a".equals(o)) list.remove(o);
             }
         });
         list.traverse(awalker);
