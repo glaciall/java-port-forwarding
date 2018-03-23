@@ -39,8 +39,15 @@ public class VLinkedList<E>
         {
             if (item.equals(curr.item))
             {
-                curr.prev.next = curr.next;
-                curr.next.prev = curr.prev;
+                if (curr == first) (first = curr.next).prev = null;
+                else if (curr == last) (last = curr.prev).next = null;
+                else
+                {
+                    curr.prev.next = curr.next;
+                    curr.next.prev = curr.prev;
+                }
+
+                java.util.LinkedList e;
                 break;
             }
             curr = curr.next;
