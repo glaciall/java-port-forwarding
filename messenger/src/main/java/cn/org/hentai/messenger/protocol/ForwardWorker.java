@@ -30,9 +30,6 @@ public class ForwardWorker implements Runnable
     // 开始转发
     private void forward() throws Exception
     {
-        // TODO: 数据包缓冲区的大小自动调整
-        byte[] localBuf = new byte[40960];
-        byte[] serverBuf = new byte[40960];
         Socket server = new Socket(Configs.get("server.addr"), Configs.getInt("server.forward.port", 11221));
         Socket local = new Socket(InetAddress.getByName("localhost"), this.port);
         server.setSoTimeout(1000 * 60);
@@ -52,16 +49,10 @@ public class ForwardWorker implements Runnable
                 int serverBufLength = serverIs.available();
                 if (localBufLength > 0)
                 {
-                    // localIs.read(localBuf, 0, localBufLength);
-                    // serverOs.write(localBuf, 0, localBufLength);
-                    // serverOs.flush();
                     transfer(localIs, serverOs, localBufLength);
                 }
                 if (serverBufLength > 0)
                 {
-                    // serverIs.read(serverBuf, 0, serverBufLength);
-                    // localOs.write(serverBuf, 0, serverBufLength);
-                    // localOs.flush();
                     transfer(serverIs, localOs, serverBufLength);
                 }
             }

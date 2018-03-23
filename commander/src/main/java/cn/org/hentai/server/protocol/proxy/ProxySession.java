@@ -37,7 +37,7 @@ public class ProxySession extends SocketSession
     @Override
     protected void converse() throws Exception
     {
-        // TODO: 通知commandserver下发一个开始转发包到主机端
+        // 通知commandserver下发一个开始转发包到主机端
         HostConnectionManager.getInstance().requestForward(this, port);
 
         Log.debug("Wait for host connection...");
@@ -60,23 +60,14 @@ public class ProxySession extends SocketSession
 
         while (true)
         {
-            byte[] data = new byte[40960];
             int clientBufLength = clientIS.available();
             if (clientBufLength > 0)
             {
-                // if (clientBufLength > data.length) data = new byte[clientBufLength];
-                // clientIS.read(data, 0, clientBufLength);
-                // hostOS.write(data, 0, clientBufLength);
-                // hostOS.flush();
                 transfer(clientIS, hostOS, clientBufLength);
             }
             int hostBufLength = hostIS.available();
             if (hostBufLength > 0)
             {
-                // if (hostBufLength > data.length) data = new byte[hostBufLength];
-                // hostIS.read(data, 0, hostBufLength);
-                // clientOS.write(data, 0, hostBufLength);
-                // clientOS.flush();;
                 transfer(hostIS, clientOS, hostBufLength);
             }
             sleep(10);
