@@ -4,6 +4,7 @@ import cn.org.hentai.server.model.Host;
 import cn.org.hentai.server.model.Port;
 import cn.org.hentai.server.protocol.proxy.ProxySession;
 import cn.org.hentai.server.util.Log;
+import cn.org.hentai.server.util.NonceStr;
 
 import java.net.Socket;
 import java.util.HashMap;
@@ -40,8 +41,8 @@ public class HostConnectionManager
         }
     }
 
-    // 请求开始转发
-    public int requestForward(ProxySession proxySession, Port port)
+    // 请求开始转发，返回本次转发会话的通信密钥
+    public String requestForward(ProxySession proxySession, Port port)
     {
         Log.debug("Request[" + port.getId() + "]: forward " + port.getHostPort() + " to " + port.getListenPort());
         CommandSession commandSession = null;
@@ -56,8 +57,9 @@ public class HostConnectionManager
         {
             proxySessions.put(seq, proxySession);
         }
-        commandSession.requestForward(seq, port);
-        return seq;
+        String nonce = NonceStr.generate(64);
+        commandSession.requestForward(seq, nonce, port);
+        return nonce;
     }
 
     // 关联到客户端的连接会话上来

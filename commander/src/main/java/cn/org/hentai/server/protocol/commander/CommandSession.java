@@ -124,8 +124,8 @@ public class CommandSession extends SocketSession
         super.release();
     }
 
-    public synchronized void requestForward(int seqId, Port port)
+    public synchronized void requestForward(int seqId, String nonce, Port port)
     {
-        commands.add(new StartForwardCommand(seqId, port.getHostPort()));
+        commands.add(new StartForwardCommand(seqId, port.getHostPort(), nonce));
     }
 }
