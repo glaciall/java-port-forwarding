@@ -19,6 +19,7 @@ public class ForwardSession extends SocketSession
     public ForwardSession(Socket hostConnection)
     {
         this.hostConnection = hostConnection;
+        this.setName("ForwardSession-" + hostConnection.getInetAddress());
     }
 
     @Override

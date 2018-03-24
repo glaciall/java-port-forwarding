@@ -31,6 +31,7 @@ public class CommandSession extends SocketSession
         this.connection = connection;
         hostDAO = BeanUtils.create(HostDAO.class);
         testTimeout = Configs.getInt("server.test-packet.timeout", 1000 * 30);
+        this.setName("CommandSession-" + connection.getInetAddress());
     }
 
     @Override
