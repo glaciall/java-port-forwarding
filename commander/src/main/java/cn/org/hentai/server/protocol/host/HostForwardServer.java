@@ -17,7 +17,7 @@ public class HostForwardServer implements Runnable
 
     private void forward() throws Exception
     {
-        ServerSocket server = new ServerSocket(Configs.getInt("server.forward.port", 11221), 1000, InetAddress.getLocalHost());
+        ServerSocket server = new ServerSocket(Configs.getInt("server.forward.port", 11221), 1000, InetAddress.getByName("0.0.0.0"));
         while (true)
         {
             Socket hostConnection = server.accept();

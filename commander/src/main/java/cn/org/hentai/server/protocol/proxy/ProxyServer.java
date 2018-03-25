@@ -24,7 +24,7 @@ public class ProxyServer implements Runnable
     {
         try
         {
-            ServerSocket server = new ServerSocket(this.port.getListenPort(), this.port.getConcurrentConnections(), InetAddress.getLocalHost());
+            ServerSocket server = new ServerSocket(this.port.getListenPort(), this.port.getConcurrentConnections(), InetAddress.getByName("0.0.0.0"));
             Log.debug("Proxy[" + port.getListenPort() + " <---> " + port.getHostPort() + " ] started...");
             while (true)
             {
@@ -38,5 +38,11 @@ public class ProxyServer implements Runnable
         {
             Log.error(e);
         }
+    }
+
+    public static void main(String[] args) throws Exception
+    {
+        InetAddress addr = InetAddress.getByAddress(new byte[]{ 0, 0, 0, 0 });
+        System.out.println(addr);
     }
 }
