@@ -28,7 +28,7 @@ public class PortDAO extends DBAccess
     public String[] configureFields()
     {
         return new String[] { "id", "user_id", "host_id", "listen_port",
-                "connect_timeout", "host_port", "state", "create_time",
+                "connect_timeout", "host_ip", "host_port", "state", "create_time",
                 "last_active_time", "so_timeout", "concurrent_connections" };
     }
 
