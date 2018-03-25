@@ -4,6 +4,7 @@ import cn.org.hentai.server.protocol.SocketSessionManager;
 import cn.org.hentai.server.util.Configs;
 import cn.org.hentai.server.util.Log;
 
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -16,7 +17,7 @@ public class HostForwardServer implements Runnable
 
     private void forward() throws Exception
     {
-        ServerSocket server = new ServerSocket(Configs.getInt("server.forward.port", 11221), 1000);
+        ServerSocket server = new ServerSocket(Configs.getInt("server.forward.port", 11221), 1000, InetAddress.getLocalHost());
         while (true)
         {
             Socket hostConnection = server.accept();

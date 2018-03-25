@@ -4,6 +4,7 @@ import cn.org.hentai.server.model.Port;
 import cn.org.hentai.server.protocol.SocketSessionManager;
 import cn.org.hentai.server.util.Log;
 
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -23,7 +24,7 @@ public class ProxyServer implements Runnable
     {
         try
         {
-            ServerSocket server = new ServerSocket(this.port.getListenPort(), this.port.getConcurrentConnections());
+            ServerSocket server = new ServerSocket(this.port.getListenPort(), this.port.getConcurrentConnections(), InetAddress.getLocalHost());
             Log.debug("Proxy[" + port.getListenPort() + " <---> " + port.getHostPort() + " ] started...");
             while (true)
             {
