@@ -83,7 +83,7 @@ public final class ProxyThreadManager
         try
         {
             portDAO = BeanUtils.create(PortDAO.class);
-            List<Port> ports = portDAO.list(0, 0);
+            List<Port> ports = portDAO.listAll();
             for (int i = 0; i < ports.size(); i++)
                 start(ports.get(i));
         }

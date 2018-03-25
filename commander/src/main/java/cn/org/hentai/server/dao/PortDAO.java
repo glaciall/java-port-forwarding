@@ -17,6 +17,20 @@ public class PortDAO extends DBAccess
         return select().byId(id).query(Port.class);
     }
 
+    // 添加新的端口映射
+    public int save(Port port)
+    {
+        int id = insertInto().valueWith(port).save();
+        port.setId(id);
+        return id;
+    }
+
+    // 删除端口映射
+    public int delete(Port port)
+    {
+        return execute("delete from ports where id = ?", port.getId());
+    }
+
     public Port getByPort(int port)
     {
         return select()
@@ -41,7 +55,14 @@ public class PortDAO extends DBAccess
     public List<Port> list(int userId, int hostId)
     {
         return select()
-                .where(clause("user_id = ?", gtz(userId)).and("host_id = ?", gtz(hostId)))
+                .where(clause("user_id = ?", (userId)).and("host_id = ?", (hostId)))
+                .queryForList(Port.class);
+    }
+
+    public List<Port> listAll()
+    {
+        return select()
+                .where(clause("state = ?", 1))
                 .queryForList(Port.class);
     }
 }

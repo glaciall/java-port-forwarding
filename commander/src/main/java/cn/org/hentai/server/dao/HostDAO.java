@@ -34,16 +34,19 @@ public class HostDAO extends DBAccess
         return id;
     }
 
-    public List<Host> find(int pageIndex, int pageSize)
+    public List<Host> find(int userId, int pageIndex, int pageSize)
     {
         return select()
+                .where(clause("user_id = ?", userId))
                 .orderBy("id", "desc")
                 .queryForPaginate(Host.class, pageIndex, pageSize);
     }
 
-    public long findCount()
+    public long findCount(int userId)
     {
-        return select().queryForCount();
+        return select()
+                .where(clause("user_id = ?", userId))
+                .queryForCount();
     }
 
     @Override

@@ -1,21 +1,22 @@
 package cn.org.hentai.server.controller;
 
 import cn.org.hentai.server.dao.HostDAO;
+import cn.org.hentai.server.dao.PortDAO;
 import cn.org.hentai.server.dao.UserDAO;
-import cn.org.hentai.server.model.Host;
-import cn.org.hentai.server.model.Page;
-import cn.org.hentai.server.model.Result;
-import cn.org.hentai.server.model.User;
+import cn.org.hentai.server.model.*;
 import cn.org.hentai.server.util.MD5;
 import cn.org.hentai.server.util.NonceStr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.util.List;
 
 /**
  * Created by matrixy on 2017-12-12.
@@ -29,6 +30,17 @@ public class MainController
 
     @Autowired
     HostDAO hostDAO;
+
+    @Autowired
+    PortDAO portDAO;
+
+    @Autowired
+    HttpServletRequest request;
+
+    private User getLoginUser()
+    {
+        return (User)request.getAttribute("loginUser");
+    }
 
     @RequestMapping("/")
     public String index()
@@ -76,10 +88,11 @@ public class MainController
     @ResponseBody
     public Result hostJson(@RequestParam(required = false, defaultValue = "1") int pageIndex, @RequestParam(required = false, defaultValue = "50") int pageSize)
     {
+        User user = this.getLoginUser();
         Result result = new Result();
         Page<Host> clients = new Page(pageIndex, pageSize);
-        clients.setList(hostDAO.find(pageIndex, pageSize));
-        clients.setRecordCount(hostDAO.findCount());
+        clients.setList(hostDAO.find(user.getId(), pageIndex, pageSize));
+        clients.setRecordCount(hostDAO.findCount(user.getId()));
         result.setData(clients);
         return result;
     }
@@ -94,6 +107,7 @@ public class MainController
         {
             Host host = new Host();
             host.setState(1);
+            host.setUserId(this.getLoginUser().getId());
             host.setName(name);
             host.setLastActiveTime(0);
             host.setIp(null);
@@ -118,6 +132,7 @@ public class MainController
         {
             Host host = hostDAO.getById(id);
             if (null == host) throw new RuntimeException("无此主机");
+            if (host.getUserId() != this.getLoginUser().getId()) throw new RuntimeException("无权操作");
 
             host.setAccesstoken(NonceStr.generate(64));
             hostDAO.update(host);
@@ -138,6 +153,7 @@ public class MainController
         {
             Host host = hostDAO.getById(id);
             if (null == host) throw new RuntimeException("无此主机");
+            if (host.getUserId() != this.getLoginUser().getId()) throw new RuntimeException("无权操作");
 
             host.setName(name);
             hostDAO.update(host);
@@ -157,6 +173,9 @@ public class MainController
 
         try
         {
+            Host host = hostDAO.getById(id);
+            if (null == host) throw new RuntimeException("无此主机");
+            if (host.getUserId() != this.getLoginUser().getId()) throw new RuntimeException("无权操作");
             hostDAO.delete(id);
         }
         catch(Exception e)
@@ -167,6 +186,33 @@ public class MainController
         return result;
     }
 
-    // TODO: 端口管理
-    // TODO: 系统设置？
+    // 端口管理
+    @RequestMapping("/manage/port")
+    public String port(@RequestParam int hostId, Model model)
+    {
+        model.addAttribute("hostId", hostId);
+        return "port";
+    }
+
+    @RequestMapping("/manage/port/json")
+    @ResponseBody
+    public Result portJson(@RequestParam int hostId)
+    {
+        Result result = new Result();
+        try
+        {
+            Page<Port> page = new Page(1, 10000);
+            List<Port> portList = portDAO.list(this.getLoginUser().getId(), hostId);
+            page.setList(portList);
+            page.setRecordCount(portList.size());
+            result.setData(page);
+        }
+        catch(Exception e)
+        {
+            result.setError(e);
+        }
+        return result;
+    }
+
+    // TODO: 系统设置
 }

@@ -17,6 +17,9 @@ public class Port
     // 服务器端监听端口
     private int listenPort;
 
+    // 主机端被代理的IP
+    private String hostIp;
+
     // 主机端被代理端口
     private int hostPort;
 
@@ -37,6 +40,14 @@ public class Port
 
     // 连接超时
     private int connectTimeout;
+
+    public String getHostIp() {
+        return hostIp;
+    }
+
+    public void setHostIp(String hostIp) {
+        this.hostIp = hostIp;
+    }
 
     public int getHostId() {
         return hostId;
@@ -153,6 +164,7 @@ public class Port
                 ", userId=" + userId +
                 ", hostId=" + hostId +
                 ", listenPort=" + listenPort +
+                ", hostIp='" + hostIp + '\'' +
                 ", hostPort=" + hostPort +
                 ", state=" + state +
                 ", createTime=" + createTime +

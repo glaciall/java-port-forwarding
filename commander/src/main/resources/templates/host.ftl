@@ -135,13 +135,14 @@
                     {
                         var shtml = '';
                         shtml += '<div class="btn-group" x-host-id="' + v + '">';
-                        shtml += '  <a href="javascript:edit(' + v + ');" class="btn btn-primary">修改名称</a>';
+                        shtml += '  <a href="${context}/manage/port?hostId=' + v + '" class="btn btn-primary">端口映射</a>';
                         shtml += '  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">';
                         shtml += '      <span class="caret"></span>';
                         shtml += '      <span class="sr-only">Toggle Dropdown</span>';
                         shtml += '  </button>';
                         shtml += '  <ul class="dropdown-menu" role="menu">';
                         // TODO: 正式上线时需要移除
+                        shtml += '      <li><a href="javascript:;" x-action="edit">修改名称</a></li>';
                         shtml += '      <li><a href="javascript:;" x-action="remove">删除</a></li>';
                         shtml += '      <li><a href="javascript:;" x-action="renew">重置令牌</a></li>';
                         shtml += '  </ul>';

@@ -27,9 +27,9 @@ public class UserDAO extends DBAccess
         return update().valueWith(user).byId().execute();
     }
 
-    public long save(User user)
+    public int save(User user)
     {
-        long id = insertInto().valueWith(user).save();
+        int id = insertInto().valueWith(user).save();
         user.setId(id);
         return id;
     }

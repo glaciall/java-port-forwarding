@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,6 +25,11 @@ public class UserInterceptor extends HandlerInterceptorAdapter
     {
         // 获取登陆的用户身份
         User user = (User)request.getSession().getAttribute("loginUser");
+        if (null == user)
+        {
+            response.sendRedirect("/");
+            return false;
+        }
         request.setAttribute("loginUser", user);
         return true;
     }
