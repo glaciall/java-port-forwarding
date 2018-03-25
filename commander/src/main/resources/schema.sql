@@ -29,6 +29,7 @@ create table if not exists ports
   user_id integer NOT NULL,
   host_id integer NOT NULL,
   listen_port integer NOT NULL UNIQUE,
+  host_ip varchar(50) default 'localhost',
   host_port integer NOT NULL,
   so_timeout integer NOT NULL,
   connect_timeout integer not null default 30,
