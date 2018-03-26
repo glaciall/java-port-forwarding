@@ -55,6 +55,7 @@ public class Result
 
     public Result setError(Exception ex)
     {
+        ex.printStackTrace();
         this.error = new ResultError(1, ex.getMessage());
         return this;
     }

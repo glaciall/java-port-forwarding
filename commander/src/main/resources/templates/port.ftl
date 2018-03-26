@@ -39,39 +39,45 @@
     </div>
     <form method="post" class="form-horizontal">
         <div class="form-group">
+            <label class="col-md-3 control-label" for="text-input">服务名称：</label>
+            <div class="col-md-9">
+                <input type="text" id="name" name="name" class="form-control" placeholder="取一个好记的名称，比如Mysql">
+            </div>
+        </div>
+        <div class="form-group">
             <label class="col-md-3 control-label" for="text-input">代理服务端口：</label>
             <div class="col-md-9">
-                <input type="text" id="name" name="name" class="form-control" placeholder="1 ~ 65535">
+                <input type="text" id="listenPort" name="listenPort" class="form-control" placeholder="1 ~ 65535">
             </div>
         </div>
         <div class="form-group">
             <label class="col-md-3 control-label" for="text-input">被代理主机：</label>
             <div class="col-md-9">
-                <input type="text" id="name" name="name" class="form-control" placeholder="ip 或 域名" value="localhost" />
+                <input type="text" id="hostIp" name="hostIp" class="form-control" placeholder="ip 或 域名" value="localhost" />
             </div>
         </div>
         <div class="form-group">
             <label class="col-md-3 control-label" for="text-input">被代理端口：</label>
             <div class="col-md-9">
-                <input type="text" id="name" name="name" class="form-control" placeholder="如远程桌面的3389端口" />
+                <input type="text" id="hostPort" name="hostPort" class="form-control" placeholder="如远程桌面的3389端口" />
             </div>
         </div>
         <div class="form-group">
             <label class="col-md-3 control-label" for="text-input">网络IO超时：</label>
             <div class="col-md-9">
-                <input type="text" id="name" name="name" class="form-control" placeholder="多长时间未读取到数据就断开连接（单位：秒）" value="30" />
+                <input type="text" id="soTimeout" name="soTimeout" class="form-control" placeholder="多长时间未读取到数据就断开连接（单位：秒）" value="30" />
             </div>
         </div>
         <div class="form-group">
             <label class="col-md-3 control-label" for="text-input">连接超时：</label>
             <div class="col-md-9">
-                <input type="text" id="name" name="name" class="form-control" placeholder="主机端多长时间未响应就断开连接（单位：秒）" value="30" />
+                <input type="text" id="connectTimeout" name="connectTimeout" class="form-control" placeholder="主机端多长时间未响应就断开连接（单位：秒）" value="30" />
             </div>
         </div>
         <div class="form-group">
             <label class="col-md-3 control-label" for="text-input">最大并发连接：</label>
             <div class="col-md-9">
-                <input type="text" id="name" name="name" class="form-control" value="10" />
+                <input type="text" id="concurrentConnections" name="concurrentConnections" class="form-control" value="10" />
             </div>
         </div>
     </form>
@@ -87,13 +93,31 @@
                 close : true,
                 ok : function(dialog)
                 {
+                    var hostId = ${hostId};
                     var name = $.trim(dialog.find('#name').val());
-                    if (name.length == 0) return alert('请填写主机名称'), false;
-                    $.post('${context}/manage/host/add', { name : name }, function(result)
+                    var listenPort = $.trim(dialog.find('#listenPort').val());
+                    var hostIp = $.trim(dialog.find('#hostIp').val());
+                    var hostPort = $.trim(dialog.find('#hostPort').val());
+                    var soTimeout = $.trim(dialog.find('#soTimeout').val());
+                    var connectTimeout = $.trim(dialog.find('#connectTimeout').val());
+                    var concurrentConnections = $.trim(dialog.find('#concurrentConnections').val());
+
+                    $.post('${context}/manage/port/save', {
+                        hostId : hostId,
+                        name : name,
+                        listenPort : listenPort,
+                        hostIp : hostIp,
+                        hostPort : hostPort,
+                        soTimeout : soTimeout,
+                        connectTimeout : connectTimeout,
+                        concurrentConnections : concurrentConnections
+                    }, function(result)
                     {
                         if (result.error.code != 0) return alert(result.error.reason);
-                        $('#host-table').paginate('reload');
+                        $('.modal').modal('hide');
+                        $('#port-table').paginate('reload');
                     });
+                    return false;
                 }
             });
         });
@@ -112,13 +136,21 @@
                     }
                 },
                 {
-                    title : '代理服务端口',
-                    name : 'listenPort',
-                    align : 'right',
+                    title : '服务名称',
+                    name : 'name',
+                    formatter : function(i, v, r)
+                    {
+                        return '<i class="fa fa-dot-circle-o ' + (r.online ? 'text-primary' : '') + '"></i> ' + v;
+                    }
                 },
                 {
                     title : '被代理主机',
                     name : 'hostIp',
+                },
+                {
+                    title : '代理服务端口',
+                    name : 'listenPort',
+                    align : 'right',
                 },
                 {
                     title : '被代理端口',
@@ -139,15 +171,6 @@
                     title : '最大并发',
                     name : 'concurrentConnections',
                     align : 'right',
-                },
-                {
-                    title : '当前并发',
-                    name : 'id',
-                    align : 'right',
-                    formatter : function(i, v, r)
-                    {
-                        return '--';
-                    }
                 },
                 {
                     title : '状态',
@@ -185,8 +208,7 @@
                         shtml += '      <span class="sr-only">Toggle Dropdown</span>';
                         shtml += '  </button>';
                         shtml += '  <ul class="dropdown-menu" role="menu">';
-                        // TODO: 正式上线时需要移除
-                        shtml += '      <li><a href="javascript:;" x-action="edit">修改参数</a></li>';
+                        shtml += '      <li><a href="javascript:;" x-action="remove">删除</a></li>';
                         shtml += '  </ul>';
                         shtml += '</div>';
                         return shtml;
@@ -205,17 +227,33 @@
 
     function enable(id)
     {
-        greeting('要启用它');
+        $.post('${context}/manage/port/enable', { portId : id }, function(result)
+        {
+            if (result.error.code) alert(result.error.reason);
+            else alert("操作成功");
+            $('#port-table').paginate('reload');
+        });
     }
 
     function disable(id)
     {
-        greeting('要禁用它');
+        $.post('${context}/manage/port/disable', { portId : id }, function(result)
+        {
+            if (result.error.code) alert(result.error.reason);
+            else alert("操作成功");
+            $('#port-table').paginate('reload');
+        });
     }
 
-    function edit(id)
+    function remove(id)
     {
-        greeting('要修改它');
+        if (!confirm('真的要删掉此端口映射配置吗？')) return;
+        $.post('${context}/manage/port/remove', { portId : id }, function(result)
+        {
+            if (result.error.code) alert(result.error.reason);
+            else alert("操作成功");
+            $('#port-table').paginate('reload');
+        });
     }
 
 </script>

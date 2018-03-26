@@ -32,7 +32,17 @@ public final class ProxyThreadManager
         return instance;
     }
 
+    // 记录了port与serversocket的对照表
     private Map<Integer, Thread> threads = new HashMap<Integer, Thread>();
+
+    // 端口代理服务是否启动
+    public boolean isOnline(int listenPort)
+    {
+        synchronized (threads)
+        {
+            return threads.containsKey(listenPort);
+        }
+    }
 
     /**
      * 开启对指定端口的转发监听
@@ -49,6 +59,7 @@ public final class ProxyThreadManager
         thread = new Thread(new ProxyServer(port));
         threads.put(port.getListenPort(), thread);
         thread.start();
+        Log.debug("start proxy server for: " + port.getListenPort());
     }
 
     /**
@@ -60,17 +71,19 @@ public final class ProxyThreadManager
         Thread thread = null;
         synchronized (threads)
         {
-            thread = threads.get(port.getListenPort());
+            thread = threads.remove(port.getListenPort());
         }
-        if (thread != null) throw new RuntimeException("转发服务未启动");
+        if (thread == null) throw new RuntimeException("转发服务未启动");
         try
         {
-            thread.stop();
+            // thread.stop();
+            thread.interrupt();
         }
         catch(Exception e)
         {
             Log.error(e);
         }
+        Log.debug("stop proxy server for: " + port.getListenPort());
     }
 
     /**

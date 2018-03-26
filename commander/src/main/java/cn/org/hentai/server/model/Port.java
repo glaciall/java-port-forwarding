@@ -1,5 +1,7 @@
 package cn.org.hentai.server.model;
 
+import cn.org.hentai.server.util.db.Transient;
+
 /**
  * Created by Expect on 2018/1/25.
  */
@@ -13,6 +15,9 @@ public class Port
 
     // 所属主机ID
     private int hostId;
+
+    // 服务名称
+    private String name;
 
     // 服务器端监听端口
     private int listenPort;
@@ -40,6 +45,28 @@ public class Port
 
     // 连接超时
     private int connectTimeout;
+
+    // 是否在线
+    @Transient
+    private boolean online;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isOnline()
+    {
+        return online;
+    }
+
+    public void setOnline(boolean online)
+    {
+        this.online = online;
+    }
 
     public String getHostIp() {
         return hostIp;
@@ -163,6 +190,7 @@ public class Port
                 "id=" + id +
                 ", userId=" + userId +
                 ", hostId=" + hostId +
+                ", name='" + name + '\'' +
                 ", listenPort=" + listenPort +
                 ", hostIp='" + hostIp + '\'' +
                 ", hostPort=" + hostPort +
@@ -172,6 +200,7 @@ public class Port
                 ", soTimeout=" + soTimeout +
                 ", concurrentConnections=" + concurrentConnections +
                 ", connectTimeout=" + connectTimeout +
+                ", online=" + online +
                 '}';
     }
 

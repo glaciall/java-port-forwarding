@@ -84,6 +84,10 @@
                 {
                     title : '名称',
                     name : 'name',
+                    formatter : function(i, v, r)
+                    {
+                        return '<i class="fa fa-desktop ' + (r.online ? 'text-primary' : '') + '"></i> ' + v;
+                    }
                 },
                 {
                     title : 'IP',

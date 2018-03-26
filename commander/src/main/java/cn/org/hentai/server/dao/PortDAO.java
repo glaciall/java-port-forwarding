@@ -38,10 +38,16 @@ public class PortDAO extends DBAccess
                 .query(Port.class);
     }
 
+    // 修改端口设置
+    public long update(Port port)
+    {
+        return update().valueWith(port).byId().execute();
+    }
+
     @Override
     public String[] configureFields()
     {
-        return new String[] { "id", "user_id", "host_id", "listen_port",
+        return new String[] { "id", "name", "user_id", "host_id", "listen_port",
                 "connect_timeout", "host_ip", "host_port", "state", "create_time",
                 "last_active_time", "so_timeout", "concurrent_connections" };
     }

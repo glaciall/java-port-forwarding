@@ -21,6 +21,12 @@ public class HostConnectionManager
     // 客户端请求转发表
     Map<Integer, ProxySession> proxySessions = new HashMap<Integer, ProxySession>();
 
+    // 是否在线
+    public boolean isOnline(int hostId)
+    {
+        return hostSessions.containsKey(hostId);
+    }
+
     // 主机端连接时注册登记
     public void register(int hostId, CommandSession session)
     {

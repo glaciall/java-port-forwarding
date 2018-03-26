@@ -4,11 +4,14 @@ import cn.org.hentai.server.dao.HostDAO;
 import cn.org.hentai.server.dao.PortDAO;
 import cn.org.hentai.server.dao.UserDAO;
 import cn.org.hentai.server.model.*;
+import cn.org.hentai.server.protocol.commander.HostConnectionManager;
+import cn.org.hentai.server.protocol.proxy.ProxyThreadManager;
 import cn.org.hentai.server.util.MD5;
 import cn.org.hentai.server.util.NonceStr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -90,10 +93,17 @@ public class MainController
     {
         User user = this.getLoginUser();
         Result result = new Result();
-        Page<Host> clients = new Page(pageIndex, pageSize);
-        clients.setList(hostDAO.find(user.getId(), pageIndex, pageSize));
-        clients.setRecordCount(hostDAO.findCount(user.getId()));
-        result.setData(clients);
+        Page<Host> hosts = new Page(pageIndex, pageSize);
+        List<Host> hostList = hostDAO.find(user.getId(), pageIndex, pageSize);
+        HostConnectionManager mgr = HostConnectionManager.getInstance();
+        for (int i = 0; i < hostList.size(); i++)
+        {
+            Host host = hostList.get(i);
+            host.setOnline(mgr.isOnline(host.getId()));
+        }
+        hosts.setList(hostList);
+        hosts.setRecordCount(hostDAO.findCount(user.getId()));
+        result.setData(hosts);
         return result;
     }
 
@@ -203,9 +213,143 @@ public class MainController
         {
             Page<Port> page = new Page(1, 10000);
             List<Port> portList = portDAO.list(this.getLoginUser().getId(), hostId);
+            ProxyThreadManager mgr = ProxyThreadManager.getInstance();
+            for (int i = 0; i < portList.size(); i++)
+            {
+                Port port = portList.get(i);
+                port.setOnline(mgr.isOnline(port.getListenPort()));
+            }
             page.setList(portList);
             page.setRecordCount(portList.size());
             result.setData(page);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            result.setError(e);
+        }
+        return result;
+    }
+
+    // 添加新端口
+    @RequestMapping("/manage/port/save")
+    @ResponseBody
+    public Result save(@RequestParam int hostId,
+                       @RequestParam String name,
+                       @RequestParam int listenPort,
+                       @RequestParam(defaultValue = "localhost") String hostIp,
+                       @RequestParam int hostPort,
+                       @RequestParam(defaultValue = "30") int soTimeout,
+                       @RequestParam(defaultValue = "30") int connectTimeout,
+                       @RequestParam(defaultValue = "10") int concurrentConnections)
+    {
+        User user = this.getLoginUser();
+        Result result = new Result();
+        try
+        {
+            Host host = hostDAO.getById(hostId);
+            if (null == host) throw new RuntimeException("无此主机");
+            if (host.getUserId() != user.getId()) throw new RuntimeException("无权添加");
+
+            if (StringUtils.isEmpty(name) || name.length() > 20) throw new RuntimeException("服务名称不能为空，最多只能20个字符");
+            if (StringUtils.isEmpty(hostIp)) throw new RuntimeException("请填写被代理主机的IP或域名");
+            if (listenPort < 1 || listenPort > 65535) throw new RuntimeException("请填写正确的代理服务端口");
+            if (hostPort < 1 || listenPort > 65535) throw new RuntimeException("请填写正确的被代理端口");
+
+            Port port = new Port();
+            port.setHostId(host.getId());
+            port.setUserId(user.getId());
+            port.setName(name);
+            port.setListenPort(listenPort);
+            port.setHostIp(hostIp);
+            port.setHostPort(hostPort);
+            port.setSoTimeout(soTimeout);
+            port.setConnectTimeout(connectTimeout);
+            port.setConcurrentConnections(concurrentConnections);
+            port.setState(1);
+            port.setLastActiveTime(0);
+            port.setCreateTime(System.currentTimeMillis());
+
+            portDAO.save(port);
+
+            // 启动此端口的监听服务
+            ProxyThreadManager.getInstance().start(port);
+        }
+        catch(Exception e)
+        {
+            result.setError(e);
+        }
+        return result;
+    }
+
+    // 删除端口转发
+    @RequestMapping("/manage/port/remove")
+    @ResponseBody
+    public Result remove(@RequestParam int portId)
+    {
+        Result result = new Result();
+        try
+        {
+            Port port = portDAO.getById(portId);
+            if (null == port) throw new RuntimeException("无此端口设置");
+            if (port.getUserId() != getLoginUser().getId()) throw new RuntimeException("无权删除");
+
+            portDAO.delete(port);
+
+            // 停止此端口的监听服务
+            ProxyThreadManager.getInstance().stop(port);
+        }
+        catch(Exception e)
+        {
+            result.setError(e);
+        }
+        return result;
+    }
+
+    // 启用端口转发
+    @RequestMapping("/manage/port/enable")
+    @ResponseBody
+    public Result enable(@RequestParam int portId)
+    {
+        Result result = new Result();
+        try
+        {
+            Port port = portDAO.getById(portId);
+            if (null == port) throw new RuntimeException("无此端口设置");
+            if (port.getUserId() != getLoginUser().getId()) throw new RuntimeException("无权修改");
+            if (port.getState() == 1) return result;
+
+            port.setState(1);
+            portDAO.update(port);
+
+            // 开启此端口的监听服务
+            ProxyThreadManager.getInstance().start(port);
+        }
+        catch(Exception e)
+        {
+            result.setError(e);
+        }
+        return result;
+    }
+
+    // 禁用端口转发
+    @RequestMapping("/manage/port/disable")
+    @ResponseBody
+    public Result disable(@RequestParam int portId)
+    {
+        Result result = new Result();
+        try
+        {
+            Port port = portDAO.getById(portId);
+            if (null == port) throw new RuntimeException("无此端口设置");
+            if (port.getUserId() != getLoginUser().getId()) throw new RuntimeException("无权修改");
+            if (port.getState() == 2) return result;
+
+            port.setState(2);
+            portDAO.update(port);
+
+            // 停止此端口的监听服务
+            ProxyThreadManager.getInstance().stop(port);
         }
         catch(Exception e)
         {

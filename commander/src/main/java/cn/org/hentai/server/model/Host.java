@@ -1,5 +1,7 @@
 package cn.org.hentai.server.model;
 
+import cn.org.hentai.server.util.db.Transient;
+
 /**
  * Created by Expect on 2017/12/27.
  */
@@ -12,6 +14,17 @@ public class Host extends BaseModel
     private String accesstoken;
     private String ip;
     private long lastActiveTime;
+
+    @Transient
+    private boolean online;
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
 
     public long getLastActiveTime() {
         return lastActiveTime;
@@ -78,6 +91,8 @@ public class Host extends BaseModel
                 ", state=" + state +
                 ", accesstoken='" + accesstoken + '\'' +
                 ", ip='" + ip + '\'' +
+                ", lastActiveTime=" + lastActiveTime +
+                ", online=" + online +
                 '}';
     }
 }

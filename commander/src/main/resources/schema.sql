@@ -28,6 +28,7 @@ create table if not exists ports
   id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   user_id integer NOT NULL,
   host_id integer NOT NULL,
+  name varchar(50),
   listen_port integer NOT NULL UNIQUE,
   host_ip varchar(50) default 'localhost',
   host_port integer NOT NULL,
