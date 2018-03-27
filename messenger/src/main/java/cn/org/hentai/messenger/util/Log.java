@@ -1,6 +1,7 @@
 package cn.org.hentai.messenger.util;
 
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 
 /**
@@ -10,25 +11,24 @@ public final class Log
 {
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static enum Type { ERROR, INFO, DEBUG };
-
     private static OutputStream logWriter = System.err;
-
     private static String getCurrentTime()
     {
         return sdf.format(new java.util.Date());
     }
+    private static byte[] BLANK = new byte[0];
 
     private static byte[] toBytes(String message, Type type)
     {
         try
         {
-            return (getCurrentTime() + " " + type + ": " + message).getBytes("UTF-8");
+            return (getCurrentTime() + " " + type + ": " + message + "\n").getBytes("UTF-8");
         }
-        catch(Exception e)
+        catch(UnsupportedEncodingException e)
         {
             // ..
         }
-        return new byte[0];
+        return BLANK;
     }
 
     public static void error(Throwable ex)
@@ -37,7 +37,6 @@ public final class Log
         {
             ex.printStackTrace();
             logWriter.write(toBytes(ex.toString(), Type.ERROR));
-            logWriter.write('\n');
         }
         catch(Exception e) { }
     }
@@ -47,7 +46,6 @@ public final class Log
         try
         {
             logWriter.write(toBytes(message, Type.ERROR));
-            logWriter.write('\n');
         }
         catch(Exception e) { }
     }
@@ -57,7 +55,6 @@ public final class Log
         try
         {
             logWriter.write(toBytes(message, Type.INFO));
-            logWriter.write('\n');
         }
         catch(Exception e) { }
     }
@@ -67,7 +64,6 @@ public final class Log
         try
         {
             logWriter.write(toBytes(message, Type.DEBUG));
-            logWriter.write('\n');
         }
         catch(Exception e) { }
     }
