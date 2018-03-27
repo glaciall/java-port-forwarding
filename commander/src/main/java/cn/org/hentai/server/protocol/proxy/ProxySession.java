@@ -107,7 +107,7 @@ public class ProxySession extends SocketSession
         ByteArrayOutputStream baos = new ByteArrayOutputStream(byteCount + 64);
         // 先读4字节，确定内容长度
         from.read(buf, 0, 3);
-        if (buf[0] != 0xfa || buf[1] != 0xfa || buf[2] != 0xfa) throw new RuntimeException("错误的协议头");
+        if ((buf[0] & 0xff) != 0xfa || (buf[1] & 0xff) != 0xfa || (buf[2] & 0xff) != 0xfa) throw new RuntimeException("错误的协议头");
         len = from.read(buf, 0, 4);
         if (len != 4) throw new RuntimeException("读取数据包长度失败");
         byteCount = ByteUtils.toInt(buf);
