@@ -41,7 +41,7 @@ public class ForwardWorker extends Thread
     public ForwardWorker(int forwardSeqId, String hostIp, int port, String nonce)
     {
         this.sequenceId = forwardSeqId;
-        this.host = host;
+        this.host = hostIp;
         this.port = port;
         this.nonce = nonce;
         this.setName("Forward-" + host + ":" + port);
