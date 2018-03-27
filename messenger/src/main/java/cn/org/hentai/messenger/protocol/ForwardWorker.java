@@ -21,6 +21,9 @@ public class ForwardWorker extends Thread
     // 服务器端给出的连接请求流水号
     private int sequenceId = 0;
 
+    // 服务器端给出的需要转发的主机IP或域名
+    private String host = null;
+
     // 服务器端给出的需要转发的TCP端口号
     private int port = 0;
 
@@ -35,12 +38,13 @@ public class ForwardWorker extends Thread
 
     private Socket server = null, local = null;
 
-    public ForwardWorker(int forwardSeqId, String nonce, int port)
+    public ForwardWorker(int forwardSeqId, String hostIp, int port, String nonce)
     {
         this.sequenceId = forwardSeqId;
+        this.host = host;
         this.port = port;
         this.nonce = nonce;
-        this.setName("Forward-" + port);
+        this.setName("Forward-" + host + ":" + port);
         iowaitTimeout = Configs.getInt("timeout.iowait", 30000);
     }
 
@@ -55,7 +59,7 @@ public class ForwardWorker extends Thread
     {
         lastExchangeTime = System.currentTimeMillis();
         server = new Socket(Configs.get("server.addr"), Configs.getInt("server.forward.port", 11221));
-        local = new Socket(InetAddress.getByName("localhost"), this.port);
+        local = new Socket(InetAddress.getByName(this.host), this.port);
         server.setSoTimeout(1000 * 60);
         local.setSoTimeout(1000 * 60);
         server.setSendBufferSize(1024 * 64);

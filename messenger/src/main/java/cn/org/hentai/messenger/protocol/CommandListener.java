@@ -70,7 +70,9 @@ public class CommandListener implements Runnable
                 int seqId = ByteUtils.getInt(data, 0, 4);
                 int port = ByteUtils.getInt(data, 4, 4);
                 String nonce = new String(data, 8, 64);
-                ForwardWorker worker = new ForwardWorker(seqId, nonce, port);
+                int len = (int)(data[8 + 64] & 0xff);
+                String hostIp = new String(data, 8 + 64 + 1, len);
+                ForwardWorker worker = new ForwardWorker(seqId, hostIp, port, nonce);
                 SessionManager.getInstance().register(worker);
                 worker.start();
                 outputStream.write(Packet.create(hostId, Packet.ENCRYPT_TYPE_DES, new ForwardRespCommand(), accessToken));
