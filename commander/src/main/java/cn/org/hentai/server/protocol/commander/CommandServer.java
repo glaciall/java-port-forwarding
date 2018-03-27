@@ -30,10 +30,16 @@ public class CommandServer implements Runnable
             while (true)
             {
                 Socket client = server.accept();
+                if (Thread.interrupted())
+                {
+                    client.close();
+                    break;
+                }
                 CommandSession session = new CommandSession(client);
                 SocketSessionManager.getInstance().register(session);
                 session.start();
             }
+            server.close();
         }
         catch(Exception e)
         {

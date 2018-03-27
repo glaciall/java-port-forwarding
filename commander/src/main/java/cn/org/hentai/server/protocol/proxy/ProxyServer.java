@@ -22,14 +22,20 @@ public class ProxyServer implements Runnable
 
     public void run()
     {
+        ServerSocket server = null;
         try
         {
-            ServerSocket server = new ServerSocket(this.port.getListenPort(), this.port.getConcurrentConnections(), InetAddress.getByName("0.0.0.0"));
+            server = new ServerSocket(this.port.getListenPort(), this.port.getConcurrentConnections(), InetAddress.getByName("0.0.0.0"));
             Log.debug("Proxy[" + port.getListenPort() + " <---> " + port.getHostPort() + " ] started...");
             while (true)
             {
                 Socket client = server.accept();
-                ProxySession session = new ProxySession(port, client, this.port.getConnectTimeout());
+                if (Thread.interrupted())
+                {
+                    client.close();
+                    break;
+                }
+                ProxySession session = new ProxySession(port, client);
                 SocketSessionManager.getInstance().register(session);
                 session.start();
             }
@@ -37,6 +43,10 @@ public class ProxyServer implements Runnable
         catch(Exception e)
         {
             Log.error(e);
+        }
+        finally
+        {
+            try { server.close(); } catch(Exception e) { }
         }
     }
 

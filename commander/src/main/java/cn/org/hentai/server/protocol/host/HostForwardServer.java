@@ -21,10 +21,16 @@ public class HostForwardServer implements Runnable
         while (true)
         {
             Socket hostConnection = server.accept();
+            if (Thread.interrupted())
+            {
+                hostConnection.close();
+                break;
+            }
             ForwardSession session = new ForwardSession(hostConnection);
             SocketSessionManager.getInstance().register(session);
             session.start();
         }
+        server.close();
     }
 
     public void run()
