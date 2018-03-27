@@ -22,16 +22,17 @@ public class ProxySession extends SocketSession
     private Port port;                      // 主机端ID
     private Socket clientConnection;        // 客户端连接
     private Socket hostConnection;          // 被代理的主机端连接
-    private int connectTimeout = 30;        // 等待主机端的连接超时时长（秒）
+    private int connectTimeout = 30000;     // 等待主机端的连接超时时长（秒）
     private long lastExchangeTime = 0;      // 主机与客户端之间最后交换数据包的时间
-    private int iowaitTimeout = 30000;      // 网络IO等待超时时长（毫秒）
+    private int iowaitTimeout = 30000;      // 网络IO等待超时时长（秒）
     private String nonce = null;            // 本次转发会话的数据加解密密钥
 
-    public ProxySession(Port port, Socket clientConnection, int connectTimeout)
+    public ProxySession(Port port, Socket clientConnection)
     {
         this.port = port;
         this.clientConnection = clientConnection;
-        this.connectTimeout = connectTimeout;
+        this.connectTimeout = port.getConnectTimeout() * 1000;
+        this.iowaitTimeout = port.getSoTimeout() * 1000;
         this.setName("Proxy[" + port.getListenPort() + " - " + port.getHostPort() + "]: " + clientConnection.getRemoteSocketAddress());
     }
 
@@ -44,6 +45,7 @@ public class ProxySession extends SocketSession
     @Override
     public boolean timedout()
     {
+        if (lastExchangeTime == 0) return false;
         return System.currentTimeMillis() - lastExchangeTime > iowaitTimeout;
     }
 
@@ -57,7 +59,7 @@ public class ProxySession extends SocketSession
         long stime = System.currentTimeMillis();
         while (this.hostConnection == null)
         {
-            if (System.currentTimeMillis() - stime > connectTimeout * 1000)
+            if (System.currentTimeMillis() - stime > connectTimeout)
             {
                 throw new SocketTimeoutException("等待主机端连接超时");
             }

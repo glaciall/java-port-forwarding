@@ -60,6 +60,7 @@ public class CommandSession extends SocketSession
     @Override
     public boolean timedout()
     {
+        if (lastActiveTime == 0) return false;
         return System.currentTimeMillis() - lastActiveTime > testTimeout;
     }
 
