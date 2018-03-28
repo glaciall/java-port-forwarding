@@ -89,7 +89,7 @@ public class ProxySession extends SocketSession
                 encryptAndTransfer(clientIS, hostOS, clientBufLength);
             }
             int hostBufLength = hostIS.available();
-            if (hostBufLength > 0)
+            if (hostBufLength >= 7)
             {
                 // 主机端到客户端，需要解密后转发
                 decryptAndTransfer(hostIS, clientOS, hostBufLength);
@@ -106,6 +106,7 @@ public class ProxySession extends SocketSession
         byteCount = Math.min(1024 * 64, byteCount);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(byteCount + 64);
         // 先读4字节，确定内容长度
+        // TODO: 读取的长度与要求的长度不一致，提供新的方法来做
         from.read(buf, 0, 3);
         Log.debug("Header Flag: " + ByteUtils.toString(buf, 3));
         if ((buf[0] & 0xff) != 0xfa || (buf[1] & 0xff) != 0xfa || (buf[2] & 0xff) != 0xfa) throw new RuntimeException("错误的协议头");

@@ -72,6 +72,7 @@ public class CommandListener implements Runnable
                 String nonce = new String(data, 8, 64);
                 int len = (int)(data[8 + 64] & 0xff);
                 String hostIp = new String(data, 8 + 64 + 1, len);
+                Log.debug("Request Forward: " + hostIp + ":" + port);
                 ForwardWorker worker = new ForwardWorker(seqId, hostIp, port, nonce);
                 SessionManager.getInstance().register(worker);
                 worker.start();

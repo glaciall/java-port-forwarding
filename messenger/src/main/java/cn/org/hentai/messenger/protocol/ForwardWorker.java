@@ -84,7 +84,7 @@ public class ForwardWorker extends Thread
                     // 本地来的数据包是原始数据包，需要加密后发出
                     encryptAndTransfer(localIs, serverOs, localBufLength);
                 }
-                if (serverBufLength > 4)
+                if (serverBufLength >= 7)
                 {
                     // 服务端来的数据包是加密的，需要解密后发出
                     decryptAndTransfer(serverIs, localOs, serverBufLength);
