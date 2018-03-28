@@ -19,6 +19,21 @@
 <link href="//apps.bdimg.com/libs/animate.css/3.1.0/animate.min.css" rel="stylesheet" />
 <style type="text/css">
     .table tbody td { vertical-align: middle !important; }
+    .greeting
+    {
+        position: absolute;
+        left: 50%;
+        width: 400px;
+        margin-left: -200px;
+        border-radius: 10px;
+        padding: 10px;
+        color: #ffffff;
+        font-size: 14px;
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.8);
+        display: none;
+        z-index: 1000000;
+    }
 </style>
 <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>

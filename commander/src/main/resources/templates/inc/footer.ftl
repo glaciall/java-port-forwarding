@@ -296,4 +296,51 @@ window.jQuery || document.write("<script src='${web_resource}/proton/js/jquery-1
     }
 
 </script>
+<script type="text/javascript">
+    $(document).ready(function()
+    {
+        $('#btn-changepwd').click(function()
+        {
+            var form = '';
+            form += '<form action="javascript:;" method="post" class="form-horizontal">';
+            form += '   <div class="form-group">';
+            form += '       <label class="col-md-3 control-label" for="text-input">旧密码：</label>';
+            form += '       <div class="col-md-9">';
+            form += '           <input type="password" id="oldPwd" name="oldPwd" class="form-control" >';
+            form += '       </div>';
+            form += '   </div>';
+
+            form += '   <div class="form-group">';
+            form += '       <label class="col-md-3 control-label" for="text-input">新密码：</label>';
+            form += '       <div class="col-md-9">';
+            form += '           <input type="password" id="password" name="password" class="form-control" >';
+            form += '       </div>';
+            form += '   </div>';
+
+            form += '   <div class="form-group">';
+            form += '       <label class="col-md-3 control-label" for="text-input">再次确认：</label>';
+            form += '       <div class="col-md-9">';
+            form += '           <input type="password" id="password2" name="password2" class="form-control" placeholder="再次输入新的登陆密码" >';
+            form += '       </div>';
+            form += '   </div>';
+
+            form += '</form>';
+            modal({
+                title : '修改登陆密码',
+                html : form,
+                close : true,
+                ok : function(dialog)
+                {
+                    $.post(rootPath + '/manage/user/passwd/reset', dialog.find('form').serialize(), function(result)
+                    {
+                        if (result.error.code) return alert(result.error.reason);
+                        alert('修改成功');
+                        $('.modal').modal('hide');
+                    });
+                    return false;
+                }
+            });
+        });
+    });
+</script>
 <!-- end: JavaScript-->

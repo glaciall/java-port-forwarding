@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.List;
@@ -73,6 +74,39 @@ public class MainController
             if (!pwd.equals(user.getPassword())) throw new RuntimeException("用户名或密码错误");
 
             session.setAttribute("loginUser", user);
+        }
+        catch(Exception e)
+        {
+            result.setError(e);
+        }
+        return result;
+    }
+
+    @RequestMapping("/logout")
+    public String logout(HttpSession session, HttpServletRequest request, HttpServletResponse response)
+    {
+        session.removeAttribute("loginUser");
+        return "/";
+    }
+
+    @RequestMapping("/manage/user/passwd/reset")
+    @ResponseBody
+    public Result resetPasswd(@RequestParam String oldPwd, @RequestParam String password, @RequestParam String password2)
+    {
+        Result result = new Result();
+        try
+        {
+            if (StringUtils.isEmpty(oldPwd)) throw new RuntimeException("请填写旧的登陆密码");
+            if (StringUtils.isEmpty(password)) throw new RuntimeException("请填写新的登陆密码");
+            if (!password.equals(password2)) throw new RuntimeException("两次输入的新的登陆密码不一致");
+            if (oldPwd.equals(password)) throw new RuntimeException("新旧密码不能一样");
+
+            User user = getLoginUser();
+            String pwd = MD5.encode(oldPwd + "<===>" + user.getSalt());
+            if (!pwd.equals(user.getPassword())) throw new RuntimeException("旧的登陆密码不正确");
+            user.setSalt(NonceStr.generate(4));
+            user.setPassword(MD5.encode(password + "<===>" + user.getSalt()));
+            userDAO.update(user);
         }
         catch(Exception e)
         {
