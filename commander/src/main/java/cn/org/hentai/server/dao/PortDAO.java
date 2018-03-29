@@ -17,7 +17,7 @@ public class PortDAO extends DBAccess
         return select().byId(id).query(Port.class);
     }
 
-    // 添加新的端口映射
+    // 添加新的端口转发
     public int save(Port port)
     {
         int id = insertInto().valueWith(port).save();
@@ -25,7 +25,7 @@ public class PortDAO extends DBAccess
         return id;
     }
 
-    // 删除端口映射
+    // 删除端口转发
     public int delete(Port port)
     {
         return execute("delete from ports where id = ?", port.getId());

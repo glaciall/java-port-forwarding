@@ -220,6 +220,10 @@ public class MainController
             Host host = hostDAO.getById(id);
             if (null == host) throw new RuntimeException("无此主机");
             if (host.getUserId() != this.getLoginUser().getId()) throw new RuntimeException("无权操作");
+
+            if (portDAO.list(getLoginUser().getId(), host.getId()).size() > 0)
+                throw new RuntimeException("请先删除该主机下的所有端口转发配置");
+
             hostDAO.delete(id);
         }
         catch(Exception e)

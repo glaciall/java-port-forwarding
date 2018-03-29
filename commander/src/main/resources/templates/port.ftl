@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <#include "./inc/resource.ftl">
-    <title>主机端口映射管理</title>
+    <title>主机端口转发管理</title>
 </head>
 <body>
 
@@ -20,8 +20,8 @@
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            主机端口映射列表
-                            <button class="btn btn-primary pull-right" id="btn-add"><i class="fa fa-plus"></i> 添加映射</button>
+                            主机端口转发列表
+                            <button class="btn btn-primary pull-right" id="btn-add"><i class="fa fa-plus"></i> 添加转发</button>
                         </div>
                         <div class="panel-body">
                             <div id="port-table"></div>
@@ -88,7 +88,7 @@
         $('#btn-add').click(function()
         {
             modal({
-                title : '添加新映射',
+                title : '添加新转发',
                 html : $('#form-add').html(),
                 close : true,
                 ok : function(dialog)
@@ -182,16 +182,6 @@
                     }
                 },
                 {
-                    title : '最近连接时间',
-                    name : 'lastActiveTime',
-                    align : 'center',
-                    formatter : function(i, v, r)
-                    {
-                        if (v == 0) return '--';
-                        return new Date(v).format('yyyy-MM-dd hh:mm:ss');
-                    }
-                },
-                {
                     title : '操作',
                     name : 'id',
                     align : 'center',
@@ -227,6 +217,7 @@
 
     function enable(id)
     {
+        if (!confirm('真的要开启此端口转发配置吗？')) return;
         $.post('${context}/manage/port/enable', { portId : id }, function(result)
         {
             if (result.error.code) alert(result.error.reason);
@@ -237,6 +228,7 @@
 
     function disable(id)
     {
+        if (!confirm('真的要禁用此端口转发配置吗？')) return;
         $.post('${context}/manage/port/disable', { portId : id }, function(result)
         {
             if (result.error.code) alert(result.error.reason);
@@ -247,7 +239,7 @@
 
     function remove(id)
     {
-        if (!confirm('真的要删掉此端口映射配置吗？')) return;
+        if (!confirm('真的要删掉此端口转发配置吗？')) return;
         $.post('${context}/manage/port/remove', { portId : id }, function(result)
         {
             if (result.error.code) alert(result.error.reason);

@@ -22,7 +22,7 @@ create table if not exists hosts
   last_active_time integer
 );
 
-/* ports 端口映射表 */
+/* ports 端口转发表 */
 create table if not exists ports
 (
   id integer PRIMARY KEY AUTOINCREMENT NOT NULL,

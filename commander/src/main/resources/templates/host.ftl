@@ -72,13 +72,13 @@
             paginate : $('.pagination'),
             fields : [
                 {
-                    title : '#',
+                    title : '主机ID',
                     name : 'id',
                     width : '100',
                     align : 'center',
                     formatter : function(i, v, r)
                     {
-                        return i + 1;
+                        return v;
                     }
                 },
                 {
@@ -109,28 +109,6 @@
                     }
                 },
                 {
-                    title : '状态',
-                    width : '80',
-                    align : 'center',
-                    name : 'state',
-                    formatter : function(i, v, r)
-                    {
-                        if (v == 1) return '离线';
-                        if (v == 2) return '在线';
-                    }
-                },
-                {
-                    title : '最近通信时间',
-                    width : '160',
-                    align : 'center',
-                    name : 'lastActiveTime',
-                    formatter : function(i, v, r)
-                    {
-                        if (v > 0) return new Date(v).format('yyyy-MM-dd hh:mm:ss');
-                        else return '--';
-                    }
-                },
-                {
                     title : '操作',
                     name : 'id',
                     align : 'center',
@@ -139,7 +117,7 @@
                     {
                         var shtml = '';
                         shtml += '<div class="btn-group" x-host-id="' + v + '">';
-                        shtml += '  <a href="${context}/manage/port?hostId=' + v + '" class="btn btn-primary">端口映射</a>';
+                        shtml += '  <a href="${context}/manage/port?hostId=' + v + '" class="btn btn-primary">端口转发</a>';
                         shtml += '  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">';
                         shtml += '      <span class="caret"></span>';
                         shtml += '      <span class="sr-only">Toggle Dropdown</span>';
