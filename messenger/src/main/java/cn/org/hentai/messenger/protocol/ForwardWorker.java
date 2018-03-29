@@ -45,7 +45,7 @@ public class ForwardWorker extends Thread
         this.port = port;
         this.nonce = nonce;
         this.setName("Forward-" + host + ":" + port);
-        iowaitTimeout = Configs.getInt("timeout.iowait", 30000);
+        iowaitTimeout = Configs.getInt("timeout.iowait", 30) * 1000;
     }
 
     // 是否己经发生了IO等待超时
@@ -57,6 +57,7 @@ public class ForwardWorker extends Thread
     // 开始转发
     private void forward() throws Exception
     {
+        Log.debug("开始转发：" + host + ":" + port);
         lastExchangeTime = System.currentTimeMillis();
         server = new Socket(Configs.get("server.addr"), Configs.getInt("server.forward.port", 11221));
         local = new Socket(InetAddress.getByName(this.host), this.port);
