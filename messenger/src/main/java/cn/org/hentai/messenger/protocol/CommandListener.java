@@ -20,18 +20,27 @@ import java.net.Socket;
  */
 public class CommandListener implements Runnable
 {
-    // 待命
-    private void listen() throws Exception
+    private int hostId;
+    private int serverPort;
+    private String accessToken;
+    private String serverAddr;
+    public CommandListener()
     {
-        int hostId = Configs.getInt("host.id", 0);
-        String accessToken = Configs.get("host.accesstoken");
+        hostId = Configs.getInt("host.id", 0);
+        serverPort = Configs.getInt("server.command.port", 1122);
+        accessToken = Configs.get("host.accesstoken");
+        serverAddr = Configs.get("server.addr");
 
         Log.info("主机ID: " + hostId);
         Log.info("访问令牌: " + accessToken);
-        Log.info("服务器地址: " + Configs.get("server.addr"));
-        Log.info("服务器端口: " + Configs.getInt("server.command.port", 1122));
+        Log.info("服务器地址: " + serverAddr);
+        Log.info("服务器端口: " + serverPort);
+    }
 
-        Socket socket = new Socket(Configs.get("server.addr"), Configs.getInt("server.command.port", 1122));
+    // 待命
+    private void listen() throws Exception
+    {
+        Socket socket = new Socket(serverAddr, serverPort);
         // socket.setSoTimeout(Configs.getInt("server.test-packet.timeout", 20000));
         socket.setSoTimeout(1000);
         InputStream inputStream = socket.getInputStream();
