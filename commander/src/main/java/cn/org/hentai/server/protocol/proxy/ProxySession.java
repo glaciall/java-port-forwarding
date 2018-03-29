@@ -96,6 +96,7 @@ public class ProxySession extends SocketSession
                 // 主机端到客户端，需要解密后转发
                 decryptAndTransfer(hostIS, clientOS, hostBufLength);
             }
+            if (hostBufLength + clientBufLength == 0) Thread.sleep(1);
             sleep(10);
         }
     }

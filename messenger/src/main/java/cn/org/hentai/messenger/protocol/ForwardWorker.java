@@ -89,6 +89,7 @@ public class ForwardWorker extends Thread
                     // 服务端来的数据包是加密的，需要解密后发出
                     decryptAndTransfer(serverIs, localOs, serverBufLength);
                 }
+                if (localBufLength + serverBufLength == 0) Thread.sleep(1);
             }
         }
         finally
