@@ -49,7 +49,7 @@ public class MainController
     @RequestMapping("/")
     public String index()
     {
-        boolean hasDB = new File("jforwarding.sqlite").exists();
+        // boolean hasDB = new File("jforwarding.sqlite").exists();
         return "login";
     }
 
