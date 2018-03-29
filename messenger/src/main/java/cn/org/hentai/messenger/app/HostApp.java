@@ -15,7 +15,5 @@ public class HostApp
 
         // 开启转发线程超时监控线程
         SessionManager.startIOTimeoutMonitor();
-
-        // TODO: 注册线程异常拦截处理器
     }
 }
