@@ -104,7 +104,7 @@ public class MainController
             User user = getLoginUser();
             String pwd = MD5.encode(oldPwd + "<===>" + user.getSalt());
             if (!pwd.equals(user.getPassword())) throw new RuntimeException("旧的登陆密码不正确");
-            user.setSalt(NonceStr.generate(4));
+            user.setSalt(NonceStr.generate(12));
             user.setPassword(MD5.encode(password + "<===>" + user.getSalt()));
             userDAO.update(user);
         }
