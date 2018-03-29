@@ -13,13 +13,12 @@ public class SessionManager
     VLinkedList<ForwardWorker> sessions = new VLinkedList<ForwardWorker>();
     VLinkedList.ListAwalker<ForwardWorker> listAwalker = new VLinkedList.ListAwalker<ForwardWorker>()
     {
-        @Override
         public void test(ForwardWorker session)
         {
             // 如果会话己发生IO等待超时，则停止线程
             if (session.timedout())
             {
-                Log.debug("Thread[" + session.getName() + "] timedout, stop it...");
+                Log.debug("会话[" + session.getName() + "]己超时，准备中断...");
                 try
                 {
                     session.terminate();
@@ -65,7 +64,6 @@ public class SessionManager
     {
         new Thread(new Runnable()
         {
-            @Override
             public void run()
             {
                 while (true)

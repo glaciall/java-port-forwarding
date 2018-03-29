@@ -26,10 +26,10 @@ public class CommandListener implements Runnable
         int hostId = Configs.getInt("host.id", 0);
         String accessToken = Configs.get("host.accesstoken");
 
-        Log.info("HostId: " + hostId);
-        Log.info("AccessToken: " + accessToken);
-        Log.info("ServerAddr: " + Configs.get("server.addr"));
-        Log.info("ServerPort: " + Configs.getInt("server.command.port", 1122));
+        Log.info("主机ID: " + hostId);
+        Log.info("访问令牌: " + accessToken);
+        Log.info("服务器地址: " + Configs.get("server.addr"));
+        Log.info("服务器端口: " + Configs.getInt("server.command.port", 1122));
 
         Socket socket = new Socket(Configs.get("server.addr"), Configs.getInt("server.command.port", 1122));
         // socket.setSoTimeout(Configs.getInt("server.test-packet.timeout", 20000));
@@ -43,7 +43,7 @@ public class CommandListener implements Runnable
         outputStream.write(packet);
         outputStream.flush();
         resp = Packet.read(inputStream, true);
-        Log.info("Connected to server...");
+        Log.info("己连接到服务器端...");
 
         // 2. 等待服务器的心跳测试包或是指令包
         while (true)
@@ -56,7 +56,7 @@ public class CommandListener implements Runnable
             }
 
             // 处理几种数据包
-            Log.debug("Recv: " + ByteUtils.toString(resp));
+            // Log.debug("Recv: " + ByteUtils.toString(resp));
             int code = Packet.getCommand(resp);
             if (code == Command.CODE_TEST)
             {
@@ -72,7 +72,7 @@ public class CommandListener implements Runnable
                 String nonce = new String(data, 8, 64);
                 int len = (int)(data[8 + 64] & 0xff);
                 String hostIp = new String(data, 8 + 64 + 1, len);
-                Log.debug("Request Forward: " + hostIp + ":" + port);
+                Log.debug("请求转发: " + hostIp + ":" + port);
                 ForwardWorker worker = new ForwardWorker(seqId, hostIp, port, nonce);
                 SessionManager.getInstance().register(worker);
                 worker.start();
@@ -83,14 +83,22 @@ public class CommandListener implements Runnable
 
     public void run()
     {
-        try
+        while (true)
         {
-            listen();
-        }
-        catch(Exception e)
-        {
-            Log.error(e);
-            // throw new RuntimeException(e);
+            try
+            {
+                listen();
+            }
+            catch(Exception e)
+            {
+                Log.error(e);
+                // throw new RuntimeException(e);
+            }
+            try
+            {
+                Thread.sleep(4000);
+            }
+            catch(Exception e) { }
         }
     }
 }

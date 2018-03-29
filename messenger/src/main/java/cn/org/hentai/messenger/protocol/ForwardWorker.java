@@ -156,7 +156,7 @@ public class ForwardWorker extends Thread
 
     public void terminate()
     {
-        Log.debug("Terminate: " + this.getName());
+        Log.debug("终止会话: " + this.getName());
         try { server.close(); } catch(Exception e) { }
         try { local.close(); } catch(Exception e) { }
         try { this.stop(); } catch(Exception e) { }
