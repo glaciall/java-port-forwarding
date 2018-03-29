@@ -153,7 +153,7 @@
             {
                 $.post('${context}/manage/host/renew', { id : id }, function(result)
                 {
-                    if (result.error.code != 0) return greeting(result.error.reason);
+                    if (result.error.code != 0) return alert(result.error.reason);
                     $('#host-table').paginate('reload');
                 });
             }
@@ -169,11 +169,11 @@
             ok : function(dialog)
             {
                 var name = $.trim(dialog.find('#name').val());
-                if (name.length == 0 || name.length > 20) return greeting('请输入主机名称，最多20个字'), false;
+                if (name.length == 0 || name.length > 20) return alert('请输入主机名称，最多20个字'), false;
                 $.post('${context}/manage/host/rename', { id : id, name : name }, function(result)
                 {
-                    if (result.error.code != 0) return greeting('操作失败：' + result.error.reason);
-                    greeting('修改成功');
+                    if (result.error.code != 0) return alert('操作失败：' + result.error.reason);
+                    alert('修改成功');
                     $('#host-table').paginate('reload');
                 });
             }
@@ -190,8 +190,8 @@
             {
                 $.post('${context}/manage/host/remove', { id : id }, function(result)
                 {
-                    if (result.error.code != 0) return greeting('操作失败：' + result.error.reason);
-                    greeting('操作成功');
+                    if (result.error.code != 0) return alert('操作失败：' + result.error.reason);
+                    alert('操作成功');
                     $('#host-table').paginate('reload');
                 });
             }

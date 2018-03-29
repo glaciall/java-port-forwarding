@@ -24,7 +24,7 @@ public class HostDAO extends DBAccess
 
     public long delete(long id)
     {
-        return execute("delete from clients where id = ?", id);
+        return execute("delete from hosts where id = ?", id);
     }
 
     public int save(Host host)
