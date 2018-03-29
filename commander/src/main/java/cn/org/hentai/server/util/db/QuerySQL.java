@@ -201,7 +201,7 @@ public class QuerySQL extends DBSQL
             sqlJoin.append(" left join " + join.tableName + " on " + join.on);
         }
         String sql = "select " + ("".equals(fieldSet) ? "*" : fieldSet) + " from " + tableName + " " + sqlJoin + " " + (null == whereClause ? "" : " where " + whereClause) + (orderBy == null ? "" : " order by " + orderBy + " " + (isAsc ? "asc" : "desc"));
-        System.err.println("SQL: " + sql);
+        // System.err.println("SQL: " + sql);
         return sql;
     }
 
@@ -223,7 +223,7 @@ public class QuerySQL extends DBSQL
             sqlJoin.append(" left join " + join.tableName + " on " + join.on);
         }
         String sql = "select count(*) as recordcount from " + tableName + " " + sqlJoin + " " + (null == whereClause ? "" : " where " + whereClause);
-        System.err.println("SQL: " + sql);
+        // System.err.println("SQL: " + sql);
         return sql;
     }
 
@@ -247,7 +247,7 @@ public class QuerySQL extends DBSQL
         }
         String sql = "select " + ("".equals(fieldSet) ? "*" : fieldSet) + " from " + tableName + " " + sqlJoin + " " + (null == whereClause ? "" : " where " + whereClause) + (orderBy == null ? "" : " order by " + orderBy + " " + (isAsc ? "asc" : "desc"));
         sql = sql + " limit " + ((pageIndex - 1) * pageSize) + ", " + pageSize;
-        System.err.println("SQL: " + sql);
+        // System.err.println("SQL: " + sql);
         return sql;
     }
 
@@ -275,7 +275,7 @@ public class QuerySQL extends DBSQL
         }
         String sql = "select " + ("".equals(fieldSet) ? "*" : fieldSet) + " from " + tableName + " " + sqlJoin + " " + (null == whereClause ? "" : " where " + whereClause) + (orderBy == null ? "" : " order by " + orderBy + " " + (isAsc ? "asc" : "desc"));
         sql = sql + " limit " + offset + ", " + count;
-        System.err.println("SQL: " + sql);
+        // System.err.println("SQL: " + sql);
         return sql;
     }
 

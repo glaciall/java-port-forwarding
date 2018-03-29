@@ -168,7 +168,7 @@ public class UpdateSQL extends DBSQL
     public Integer execute()
     {
         String sql = toSQL(false);
-        System.err.println("SQL: " + sql);
+        // System.err.println("SQL: " + sql);
         if (this.values != null && this.values.size() > 0)
             return this.getJdbcTemplate().update(sql, this.values.toArray());
         else
