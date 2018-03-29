@@ -6,6 +6,7 @@ import cn.org.hentai.server.util.BeanUtils;
 import cn.org.hentai.server.util.Log;
 import org.springframework.context.ApplicationContext;
 
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,9 +82,15 @@ public final class ProxyThreadManager
         }
         catch(Exception e)
         {
-            Log.error(e);
+            throw new RuntimeException(e);
         }
-        Log.debug("stop proxy server for: " + port.getListenPort());
+        Socket client = null;
+        try
+        {
+            // 主动连接一下，让阻塞的线程继续往下执行
+            client = new Socket("localhost", port.getListenPort());
+        }
+        catch(Exception e) { }
     }
 
     /**
