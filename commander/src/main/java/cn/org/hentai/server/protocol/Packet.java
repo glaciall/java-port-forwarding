@@ -41,7 +41,7 @@ public final class Packet
         // 读取数据体
         data = new byte[bodyLength];
         int recv = reader.read(data);
-        if (bodyLength != recv) throw new RuntimeException("cannot read enough data from stream");
+        if (bodyLength != recv) throw new RuntimeException("无法从流中读取足够的数据");
         buff.write(data);
         return buff.toByteArray();
     }
@@ -63,7 +63,7 @@ public final class Packet
         byte[] encryptedData = null;
         if (encryptType == 0x00) ;
         else if (encryptType == 0x01) encryptedData = DES.encrypt(data, accesstoken);
-        else throw new RuntimeException("unsupported encrypt method: " + encryptType);
+        else throw new RuntimeException("不支持的加密类型: " + encryptType);
 
         int encryptedDataLength = encryptedData.length;
         byte[] packet = new byte[3 + 4 + 4 + 2 + encryptedDataLength];
@@ -104,10 +104,10 @@ public final class Packet
         int dataLength = getDataLength(packet);
         byte[] data = new byte[dataLength];
         System.arraycopy(packet, 13, data, 0, dataLength);
-        if (accesstoken != null && encryptType == 0x00) throw new RuntimeException("no encrypted packet: " + ByteUtils.toString(packet));
+        if (accesstoken != null && encryptType == 0x00) throw new RuntimeException("未加密的数据包: " + ByteUtils.toString(packet));
         if (encryptType == 0x00) return data;
         else if (encryptType == 0x01) return DES.decrypt(data, accesstoken);
-        else throw new RuntimeException("unsupported encrypt method: " + encryptType);
+        else throw new RuntimeException("不支持的加密类型: " + encryptType);
     }
 
     public static void main(String[] args) throws Exception

@@ -26,7 +26,7 @@ public class CommandServer implements Runnable
         {
             listenPort = Configs.getInt("server.command.port", 1212);
             server = new ServerSocket(listenPort, 1000, InetAddress.getByName("0.0.0.0"));
-            Log.debug("Command Server started on: " + listenPort);
+            Log.debug("指令服务器监听于: " + listenPort);
             while (true)
             {
                 Socket client = server.accept();

@@ -14,13 +14,12 @@ public class SocketSessionManager
     VLinkedList<SocketSession> sessions = new VLinkedList<SocketSession>();
     VLinkedList.ListAwalker<SocketSession> listAwalker = new VLinkedList.ListAwalker<SocketSession>()
     {
-        @Override
         public void test(SocketSession session)
         {
             // 如果会话己发生IO等待超时，则停止线程
             if (session.timedout())
             {
-                Log.debug("Thread[" + session.getName() + "] timedout, stop it...");
+                Log.debug("会话[" + session.getName() + "]己超时, 准备终止...");
                 try
                 {
                     session.terminate();
@@ -66,7 +65,6 @@ public class SocketSessionManager
     {
         new Thread(new Runnable()
         {
-            @Override
             public void run()
             {
                 while (true)

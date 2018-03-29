@@ -42,7 +42,7 @@ public class ForwardSession extends SocketSession
             byte[] data = new byte[4];
             if (inputStream.read(data) != 4) throw new RuntimeException("读取流水号失败，无法关联会话");
             int sequenceId = ByteUtils.toInt(data);
-            Log.debug("Forward for: " + sequenceId);
+            Log.debug("开始转发, 流水号: " + sequenceId);
             HostConnectionManager.getInstance().attach(sequenceId, hostConnection);
         }
         catch(Exception e)

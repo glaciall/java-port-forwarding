@@ -30,7 +30,7 @@ public class HostConnectionManager
     // 主机端连接时注册登记
     public void register(int hostId, CommandSession session)
     {
-        Log.debug("Register: " + hostId);
+        // Log.debug("Register: " + hostId);
         // if (hostSessions.containsKey(hostId)) throw new RuntimeException("主机端己连接");
         synchronized (hostSessions)
         {
@@ -50,7 +50,7 @@ public class HostConnectionManager
     // 请求开始转发，返回本次转发会话的通信密钥
     public String requestForward(ProxySession proxySession, Port port)
     {
-        Log.debug("Request[" + port.getId() + "]: forward " + port.getHostPort() + " to " + port.getListenPort());
+        Log.debug("客户端[" + port.getId() + "]: 请求转发 " + port.getHostPort() + " 至 " + port.getListenPort());
         CommandSession commandSession = null;
         synchronized (hostSessions)
         {

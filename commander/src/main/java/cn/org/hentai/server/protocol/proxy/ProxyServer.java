@@ -26,7 +26,7 @@ public class ProxyServer implements Runnable
         try
         {
             server = new ServerSocket(this.port.getListenPort(), this.port.getConcurrentConnections(), InetAddress.getByName("0.0.0.0"));
-            Log.debug("Proxy[" + port.getListenPort() + " <---> " + port.getHostPort() + " ] started...");
+            Log.debug("代理服务[" + port.getListenPort() + " <---> " + port.getHostPort() + " ] 己启动...");
             while (true)
             {
                 Socket client = server.accept();

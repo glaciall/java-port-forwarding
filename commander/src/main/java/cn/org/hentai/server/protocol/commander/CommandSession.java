@@ -43,7 +43,7 @@ public class CommandSession extends SocketSession
         // 先读取一个包，确定一下主机端的身份
         host = authenticate(inputStream, outputStream);
         HostConnectionManager.getInstance().register(host.getId(), this);
-        Log.debug("Host: " + host.getName() + " connected...");
+        Log.debug("主机: " + host.getName() + "己连接...");
 
         while (true)
         {
@@ -109,9 +109,9 @@ public class CommandSession extends SocketSession
         byte[] packet = Packet.read(inputStream, true);
         int hostId = Packet.getHostId(packet);
         Host host = hostDAO.getById(hostId);
-        if (null == host) throw new RuntimeException("no such host: " + hostId);
+        if (null == host) throw new RuntimeException("查无此主机: " + hostId);
         byte[] decrypted = Packet.getData(packet, host.getAccesstoken());
-        if (!"authenticate".equals(new String(decrypted))) throw new RuntimeException("invalid authenticate packet: " + ByteUtils.toString(packet));
+        if (!"authenticate".equals(new String(decrypted))) throw new RuntimeException("错误的验证包: " + ByteUtils.toString(packet));
         outputStream.write(Packet.create(hostId, Packet.ENCRYPT_TYPE_DES, Command.CODE_AUTHENTICATE, NonceStr.generate(32).getBytes(), host.getAccesstoken()));
         outputStream.flush();
         return host;

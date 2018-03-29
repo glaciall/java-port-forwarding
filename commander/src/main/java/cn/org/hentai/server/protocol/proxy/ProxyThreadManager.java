@@ -60,7 +60,6 @@ public final class ProxyThreadManager
         thread = new Thread(new ProxyServer(port));
         threads.put(port.getListenPort(), thread);
         thread.start();
-        Log.debug("start proxy server for: " + port.getListenPort());
     }
 
     /**
