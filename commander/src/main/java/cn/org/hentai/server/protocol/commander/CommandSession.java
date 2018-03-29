@@ -34,6 +34,11 @@ public class CommandSession extends SocketSession
         this.setName("CommandSession-" + connection.getInetAddress());
     }
 
+    public String getHostIP()
+    {
+        return this.connection.getInetAddress().toString();
+    }
+
     @Override
     protected void converse() throws Exception
     {

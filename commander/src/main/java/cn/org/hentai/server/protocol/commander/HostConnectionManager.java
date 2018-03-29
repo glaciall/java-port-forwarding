@@ -27,6 +27,12 @@ public class HostConnectionManager
         return hostSessions.containsKey(hostId);
     }
 
+    public String getHostIp(int hostId)
+    {
+        if (!hostSessions.containsKey(hostId)) return null;
+        else return hostSessions.get(hostId).getHostIP();
+    }
+
     // 主机端连接时注册登记
     public void register(int hostId, CommandSession session)
     {

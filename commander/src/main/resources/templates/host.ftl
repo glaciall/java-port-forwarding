@@ -95,7 +95,7 @@
                     width : '140',
                     formatter : function(i, v, r)
                     {
-                        return v == null || typeof(v) == 'undefined' ? '--' : v;
+                        return v == null || typeof(v) == 'undefined' ? '--' : v.replace(/^\//gi, '');
                     }
                 },
                 {

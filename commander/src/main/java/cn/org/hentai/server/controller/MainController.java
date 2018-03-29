@@ -134,6 +134,7 @@ public class MainController
         {
             Host host = hostList.get(i);
             host.setOnline(mgr.isOnline(host.getId()));
+            host.setIp(mgr.getHostIp(host.getId()));
         }
         hosts.setList(hostList);
         hosts.setRecordCount(hostDAO.findCount(user.getId()));
