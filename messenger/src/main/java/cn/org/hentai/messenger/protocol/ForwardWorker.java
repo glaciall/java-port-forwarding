@@ -45,7 +45,7 @@ public class ForwardWorker extends Thread
         this.port = port;
         this.nonce = nonce;
         this.setName("Forward-" + host + ":" + port);
-        iowaitTimeout = Configs.getInt("timeout.iowait", 30) * 1000;
+        iowaitTimeout = Configs.getInt("timeout.iowait", 30000);
     }
 
     // 是否己经发生了IO等待超时
@@ -61,8 +61,8 @@ public class ForwardWorker extends Thread
         lastExchangeTime = System.currentTimeMillis();
         server = new Socket(Configs.get("server.addr"), Configs.getInt("server.forward.port", 11221));
         local = new Socket(InetAddress.getByName(this.host), this.port);
-        server.setSoTimeout(1000 * 60);
-        local.setSoTimeout(1000 * 60);
+        server.setSoTimeout(this.iowaitTimeout);
+        local.setSoTimeout(this.iowaitTimeout);
         server.setSendBufferSize(1024 * 64);
         server.setReceiveBufferSize(1024 * 64);
         local.setSendBufferSize(1024 * 64);
@@ -91,6 +91,7 @@ public class ForwardWorker extends Thread
                     decryptAndTransfer(serverIs, localOs, serverBufLength);
                 }
                 if (localBufLength + serverBufLength == 0) Thread.sleep(1);
+                if (System.currentTimeMillis() - lastExchangeTime > iowaitTimeout) break;
             }
         }
         finally
