@@ -24,7 +24,7 @@ public class Configs
     {
         Object val = properties.get(key);
         if (null == val) return null;
-        else return String.valueOf(val);
+        else return String.valueOf(val).trim();
     }
 
     public static int getInt(String key, int defaultVal)
