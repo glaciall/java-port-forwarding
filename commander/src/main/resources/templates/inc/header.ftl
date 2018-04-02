@@ -9,7 +9,10 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li class="visible-md visible-lg">
-                <a href="javascript:;" class="dropdown-toggle" id="btn-changepwd">${loginUser.name}</a>
+                <a href="javascript:;" class="dropdown-toggle">${loginUser.name}</a>
+            </li>
+            <li class="visible-md visible-lg">
+                <a href="javascript:;" class="dropdown-toggle" id="btn-changepwd">修改密码</a>
             </li>
             <li><a href="${context}/logout"><i class="fa fa-power-off"></i></a></li>
         </ul>
