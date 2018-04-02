@@ -42,6 +42,7 @@ public class CommandSession extends SocketSession
     @Override
     protected void converse() throws Exception
     {
+        this.connection.setSoTimeout(testTimeout * 2);
         InputStream inputStream = this.connection.getInputStream();
         OutputStream outputStream = this.connection.getOutputStream();
 
