@@ -45,11 +45,13 @@ public class HostConnectionManager
     }
 
     // 主机端的连接断开时取消注册
-    public void unregister(CommandSession session)
+    public void unregister(int hostId, CommandSession commandSession)
     {
         synchronized (hostSessions)
         {
-            hostSessions.remove(session);
+            CommandSession session = hostSessions.get(hostId);
+            if (session != commandSession) return;
+            hostSessions.remove(hostId);
         }
     }
 

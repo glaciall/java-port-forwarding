@@ -127,7 +127,7 @@ public class CommandSession extends SocketSession
     protected void release()
     {
         try { this.connection.close(); } catch(Exception e) { }
-        try { HostConnectionManager.getInstance().unregister(this); } catch(Exception e) { }
+        try { HostConnectionManager.getInstance().unregister(this.host.getId(), this); } catch(Exception e) { }
         super.release();
     }
 

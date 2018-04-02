@@ -30,6 +30,11 @@ public abstract class SocketSession extends Thread
             this.stop();
         }
         catch(Exception e) { }
+        try
+        {
+            this.release();
+        }
+        catch(Exception e) { }
         Log.debug("会话己终止: " + this.getName());
     }
 
