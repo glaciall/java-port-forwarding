@@ -33,7 +33,12 @@
 3. 在拥有固定IP的服务器端执行`java -jar original-commander-1.0-SNAPSHOT.jar`。
 4. 在主机端执行`java -jar messenger-1.0-SNAPSHOT.jar`，如果需要后台运行，可执行`javaw -jar messenger-1.0-SNAPSHOT.jar`。
 5. 使用初始账号`admin`及密码`123456`登陆http://serverip:8888/，进行主机端的端口转发管理。
-6. **别忘了修改初始登陆密码。**
+6. **别忘了修改初始登陆密码（登陆后右上角用户名处）。**
+
+## 常见问题
+1. 服务器端如果启用了IPv6，则端口监听可能会默认绑定到IPv6的IP上，从而会导致主机端无法连接，在启动服务端后，通过`netstat -anop|grep LIST|grep java`看看`${server.command.port}`所绑定的IP是多少，确定己经正确显示为`0.0.0.0:12121`才算正常。否则请自行搜索`如何关闭IPv6`。
+2. 在阿里云的ECS上，所有的云主机都有端口黑白名单，如果前一步己经正确，则可以通过在服务器上执行`telnet localhost 12121`以及在本地执行`telnet ${server.addr} 12121`来确定，是否有端口白名单或是防火墙。
+3. Ubuntu Server上，可通过`ufw allow 12121/tcp`等命令，开放相应的TCP端口的访问权。
 
 ### 指令数据包结构
 * FA FA FA 协议头
