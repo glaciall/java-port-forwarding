@@ -22,14 +22,17 @@ public class CommandListener implements Runnable
 {
     private int hostId;
     private int serverPort;
+    private int iowaitTimeout;
     private String accessToken;
     private String serverAddr;
+    private long lastExchangeTime = 0L;
     public CommandListener()
     {
         hostId = Configs.getInt("host.id", 0);
         serverPort = Configs.getInt("server.command.port", 1122);
         accessToken = Configs.get("host.accesstoken");
         serverAddr = Configs.get("server.addr");
+        iowaitTimeout = Configs.getInt("server.test-packet.timeout", 20000);
 
         Log.info("主机ID: " + hostId);
         Log.info("访问令牌: " + accessToken);
@@ -41,7 +44,7 @@ public class CommandListener implements Runnable
     private void listen() throws Exception
     {
         Socket socket = new Socket(serverAddr, serverPort);
-        socket.setSoTimeout(Configs.getInt("server.test-packet.timeout", 20000));
+        socket.setSoTimeout(iowaitTimeout);
         InputStream inputStream = socket.getInputStream();
         OutputStream outputStream = socket.getOutputStream();
 
@@ -51,7 +54,8 @@ public class CommandListener implements Runnable
         outputStream.write(packet);
         outputStream.flush();
         resp = Packet.read(inputStream, true);
-        Log.info("己连接到服务器端...");
+        Log.debug("己连接到服务器端...");
+        lastExchangeTime = System.currentTimeMillis();
 
         // 2. 等待服务器的心跳测试包或是指令包
         while (true)
@@ -59,9 +63,12 @@ public class CommandListener implements Runnable
             resp = Packet.read(inputStream);
             if (null == resp)
             {
+                if (System.currentTimeMillis() - lastExchangeTime > iowaitTimeout) break;
                 Thread.sleep(100);
                 continue;
             }
+
+            lastExchangeTime = System.currentTimeMillis();
 
             // 处理几种数据包
             // Log.debug("Recv: " + ByteUtils.toString(resp));
@@ -87,6 +94,10 @@ public class CommandListener implements Runnable
                 outputStream.write(Packet.create(hostId, Packet.ENCRYPT_TYPE_DES, new ForwardRespCommand(), accessToken));
             }
         }
+        Log.debug("己断开连接...");
+        try { inputStream.close(); } catch(Exception e) { }
+        try { outputStream.close(); } catch(Exception e) { }
+        try { socket.close(); } catch(Exception e) { }
     }
 
     public void run()
