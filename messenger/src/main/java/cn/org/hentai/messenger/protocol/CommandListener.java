@@ -41,8 +41,7 @@ public class CommandListener implements Runnable
     private void listen() throws Exception
     {
         Socket socket = new Socket(serverAddr, serverPort);
-        // socket.setSoTimeout(Configs.getInt("server.test-packet.timeout", 20000));
-        socket.setSoTimeout(1000);
+        socket.setSoTimeout(Configs.getInt("server.test-packet.timeout", 20000));
         InputStream inputStream = socket.getInputStream();
         OutputStream outputStream = socket.getOutputStream();
 
