@@ -97,7 +97,6 @@ public class ProxySession extends SocketSession
                 decryptAndTransfer(hostIS, clientOS, hostBufLength);
             }
             if (hostBufLength + clientBufLength == 0) Thread.sleep(1);
-            sleep(10);
         }
     }
 
