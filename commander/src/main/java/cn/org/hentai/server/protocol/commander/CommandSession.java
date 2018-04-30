@@ -51,7 +51,7 @@ public class CommandSession extends SocketSession
         HostConnectionManager.getInstance().register(host.getId(), this);
         Log.debug("主机: " + host.getName() + "己连接...");
 
-        while (true)
+        while (!Thread.interrupted())
         {
             // 测试连接的可用性
             testConnection(inputStream, outputStream);

@@ -27,7 +27,7 @@ public abstract class SocketSession extends Thread
     {
         try
         {
-            this.stop();
+            this.interrupt();
         }
         catch(Exception e) { }
         try
