@@ -82,7 +82,7 @@ public class ProxySession extends SocketSession
         InputStream hostIS = this.hostConnection.getInputStream();
         OutputStream hostOS = this.hostConnection.getOutputStream();
 
-        while (!Thread.interrupted())
+        while (!timedout())
         {
             int clientBufLength = clientIS.available();
             if (clientBufLength > 0)

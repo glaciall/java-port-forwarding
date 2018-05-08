@@ -1,16 +1,11 @@
 package cn.org.hentai.server.protocol.commander;
 
-import cn.org.hentai.server.model.Host;
-import cn.org.hentai.server.protocol.SocketSession;
-import cn.org.hentai.server.protocol.SocketSessionManager;
 import cn.org.hentai.server.util.Configs;
 import cn.org.hentai.server.util.Log;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by Expect on 2018/1/25.
@@ -36,7 +31,6 @@ public class CommandServer implements Runnable
                     break;
                 }
                 CommandSession session = new CommandSession(client);
-                SocketSessionManager.getInstance().register(session);
                 session.start();
             }
             server.close();
