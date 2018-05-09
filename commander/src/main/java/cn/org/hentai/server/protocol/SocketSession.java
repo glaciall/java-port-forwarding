@@ -13,7 +13,7 @@ public abstract class SocketSession extends Thread
     // 资源释放
     protected void release()
     {
-        SocketSessionManager.getInstance().unregister(this);
+        // ...
     }
 
     // 是否超时

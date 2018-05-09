@@ -1,6 +1,5 @@
 package cn.org.hentai.server.protocol.host;
 
-import cn.org.hentai.server.protocol.SocketSessionManager;
 import cn.org.hentai.server.util.Configs;
 import cn.org.hentai.server.util.Log;
 
@@ -27,7 +26,6 @@ public class HostForwardServer implements Runnable
                 break;
             }
             ForwardSession session = new ForwardSession(hostConnection);
-            SocketSessionManager.getInstance().register(session);
             session.start();
         }
         server.close();

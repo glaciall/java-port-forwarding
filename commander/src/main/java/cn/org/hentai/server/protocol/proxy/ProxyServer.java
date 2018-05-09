@@ -1,7 +1,6 @@
 package cn.org.hentai.server.protocol.proxy;
 
 import cn.org.hentai.server.model.Port;
-import cn.org.hentai.server.protocol.SocketSessionManager;
 import cn.org.hentai.server.util.Log;
 
 import java.net.InetAddress;
@@ -36,7 +35,6 @@ public class ProxyServer implements Runnable
                     break;
                 }
                 ProxySession session = new ProxySession(port, client);
-                SocketSessionManager.getInstance().register(session);
                 session.start();
             }
         }
