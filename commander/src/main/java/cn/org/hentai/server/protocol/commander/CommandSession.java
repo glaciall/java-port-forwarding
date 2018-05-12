@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.LinkedList;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by Expect on 2018/1/25.
@@ -24,7 +25,7 @@ public class CommandSession extends SocketSession
     Socket connection = null;
     long lastActiveTime = System.currentTimeMillis();
     int testTimeout = 0;
-    LinkedList<Command> commands = new LinkedList<Command>();                     // 待下发的指令
+    LinkedBlockingQueue <Command> commands = new LinkedBlockingQueue<Command>();                     // 待下发的指令
 
     public CommandSession(Socket connection)
     {
@@ -43,23 +44,34 @@ public class CommandSession extends SocketSession
     protected void converse() throws Exception
     {
         this.connection.setSoTimeout(testTimeout * 2);
-        InputStream inputStream = this.connection.getInputStream();
-        OutputStream outputStream = this.connection.getOutputStream();
+        final InputStream inputStream = this.connection.getInputStream();
+        final OutputStream outputStream = this.connection.getOutputStream();
 
         // 先读取一个包，确定一下主机端的身份
         host = authenticate(inputStream, outputStream);
         HostConnectionManager.getInstance().register(host.getId(), this);
         Log.debug("主机: " + host.getName() + "己连接...");
+        // 测试连接的可用性
+        new Thread(new Runnable(){
 
+            @Override
+            public void run() {
+                while (!timedout())
+                {
+                    try {
+                        testConnection(inputStream, outputStream);
+                        Thread.sleep(testTimeout);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        }).start();
         while (!timedout())
         {
-            // 测试连接的可用性
-            testConnection(inputStream, outputStream);
-
             // 是否有需要下发的指令？
             sendCommand(inputStream, outputStream);
-
-            Thread.sleep(10);
         }
     }
 
@@ -77,9 +89,7 @@ public class CommandSession extends SocketSession
      */
     private void sendCommand(InputStream inputStream, OutputStream outputStream) throws Exception
     {
-        if (commands.size() == 0) return;
-        Command cmd = commands.removeFirst();
-        if (null == cmd) return;
+        Command cmd = commands.take();
         byte[] packet = Packet.create(host.getId(), Packet.ENCRYPT_TYPE_DES, cmd.getCode(), cmd.getBytes(), host.getAccesstoken());
         outputStream.write(packet);
         outputStream.flush();
@@ -133,6 +143,10 @@ public class CommandSession extends SocketSession
 
     public synchronized void requestForward(int seqId, String nonce, Port port)
     {
-        commands.add(new StartForwardCommand(seqId, port.getHostIp(), port.getHostPort(), nonce));
+        try {
+            commands.put(new StartForwardCommand(seqId, port.getHostIp(), port.getHostPort(), nonce));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
