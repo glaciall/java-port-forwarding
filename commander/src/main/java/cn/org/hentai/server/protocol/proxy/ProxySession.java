@@ -40,6 +40,12 @@ public class ProxySession extends SocketSession
     public void attach(Socket hostConnection)
     {
         this.hostConnection = hostConnection;
+        Log.debug("主机端己连接");
+        try {
+            g();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -58,17 +64,12 @@ public class ProxySession extends SocketSession
         this.nonce = HostConnectionManager.getInstance().requestForward(this, port);
 
         Log.debug("等待主机端连接...");
-        long stime = System.currentTimeMillis();
-        while (this.hostConnection == null)
-        {
-            if (System.currentTimeMillis() - stime > connectTimeout)
-            {
-                throw new SocketTimeoutException("等待主机端连接超时");
-            }
-            sleep(10);
+        while (!timedout()){
+            sleep(connectTimeout);
         }
-        Log.debug("主机端己连接");
+    }
 
+    private void g() throws Exception {
         lastExchangeTime = System.currentTimeMillis();
 
         this.clientConnection.setSendBufferSize(1024 * 64);
@@ -95,6 +96,10 @@ public class ProxySession extends SocketSession
             {
                 // 主机端到客户端，需要解密后转发
                 decryptAndTransfer(hostIS, clientOS, hostBufLength);
+//               如果不关闭 浏览器访问有更好的性能
+//                ab -n 1 -c 1 http://127.0.0.1:2222/  会触发超时
+//                clientConnection.close();
+//                return;
             }
             if (hostBufLength + clientBufLength == 0) Thread.sleep(1);
         }

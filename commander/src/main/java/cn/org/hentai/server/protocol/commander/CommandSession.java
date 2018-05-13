@@ -51,7 +51,7 @@ public class CommandSession extends SocketSession
         host = authenticate(inputStream, outputStream);
         HostConnectionManager.getInstance().register(host.getId(), this);
         Log.debug("主机: " + host.getName() + "己连接...");
-        // 测试连接的可用性
+        // 保证连接的可用性
         new Thread(new Runnable(){
 
             @Override
@@ -59,9 +59,14 @@ public class CommandSession extends SocketSession
                 while (!timedout())
                 {
                     try {
-                        testConnection(inputStream, outputStream);
-                        Thread.sleep(testTimeout);
+                        heartBeat(inputStream, outputStream);
+
                     } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        Thread.sleep(testTimeout/3);
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
@@ -102,9 +107,8 @@ public class CommandSession extends SocketSession
      * @param inputStream
      * @param outputStream
      */
-    private void testConnection(InputStream inputStream, OutputStream outputStream) throws Exception
+    private void heartBeat(InputStream inputStream, OutputStream outputStream) throws Exception
     {
-        if (System.currentTimeMillis() - lastActiveTime < testTimeout) return;
         byte[] data = NonceStr.generate(32).getBytes();
         byte[] packet = Packet.create(host.getId(), Packet.ENCRYPT_TYPE_DES, Command.CODE_TEST, data, host.getAccesstoken());
         outputStream.write(packet);
