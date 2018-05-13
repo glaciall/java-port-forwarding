@@ -26,7 +26,9 @@
 * 可转发本机或局域网内其它任何机器的TCP数据包
 
 ### 设置
-
+## 原理
+假设我们需要把一台局域网的80端口暴露出来，我们利用公网服务器的2222端口来转发，那么流程是这样的。
+![原理](https://gitee.com/uploads/images/2018/0513/223357_6e57ac16_1925495.png "屏幕截图.png")
 ## 快速开始
 1. 按需修改两个模块下的配置文件，比如几个端口及主机端的服务器地址等。
 2. 使用Maven打包，`mvn package`，将会在`target`目录下分别生成服务器端`original-commander-1.0-SNAPSHOT.jar`和主机端`messenger-1.0-SNAPSHOT.jar`。
