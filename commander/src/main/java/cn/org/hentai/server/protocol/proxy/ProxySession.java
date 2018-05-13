@@ -19,6 +19,7 @@ import java.net.SocketTimeoutException;
  */
 public class ProxySession extends SocketSession
 {
+    private  Object obj = new Object();
     private Port port;                      // 主机端ID
     private Socket clientConnection;        // 客户端连接
     private Socket hostConnection;          // 被代理的主机端连接
@@ -40,11 +41,8 @@ public class ProxySession extends SocketSession
     public void attach(Socket hostConnection)
     {
         this.hostConnection = hostConnection;
-        Log.debug("主机端己连接");
-        try {
-            g();
-        } catch (Exception e) {
-            e.printStackTrace();
+        synchronized (obj) {
+            obj.notify();
         }
     }
 
@@ -64,12 +62,15 @@ public class ProxySession extends SocketSession
         this.nonce = HostConnectionManager.getInstance().requestForward(this, port);
 
         Log.debug("等待主机端连接...");
-        while (!timedout()){
-            sleep(connectTimeout);
+        long stime = System.currentTimeMillis();
+        while (this.hostConnection == null)
+        {
+            synchronized (obj) {
+                obj.wait(connectTimeout);
+            }
         }
-    }
+        Log.debug("主机端己连接");
 
-    private void g() throws Exception {
         lastExchangeTime = System.currentTimeMillis();
 
         this.clientConnection.setSendBufferSize(1024 * 64);
