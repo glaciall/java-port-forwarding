@@ -19,6 +19,7 @@ import java.net.SocketTimeoutException;
  */
 public class ProxySession extends SocketSession
 {
+    private  Object obj = new Object();
     private Port port;                      // 主机端ID
     private Socket clientConnection;        // 客户端连接
     private Socket hostConnection;          // 被代理的主机端连接
@@ -40,6 +41,9 @@ public class ProxySession extends SocketSession
     public void attach(Socket hostConnection)
     {
         this.hostConnection = hostConnection;
+        synchronized (obj) {
+            obj.notify();
+        }
     }
 
     @Override
@@ -61,11 +65,9 @@ public class ProxySession extends SocketSession
         long stime = System.currentTimeMillis();
         while (this.hostConnection == null)
         {
-            if (System.currentTimeMillis() - stime > connectTimeout)
-            {
-                throw new SocketTimeoutException("等待主机端连接超时");
+            synchronized (obj) {
+                obj.wait(connectTimeout);
             }
-            sleep(10);
         }
         Log.debug("主机端己连接");
 
@@ -95,6 +97,10 @@ public class ProxySession extends SocketSession
             {
                 // 主机端到客户端，需要解密后转发
                 decryptAndTransfer(hostIS, clientOS, hostBufLength);
+//               如果不关闭 浏览器访问有更好的性能
+//                ab -n 1 -c 1 http://127.0.0.1:2222/  会触发超时
+//                clientConnection.close();
+//                return;
             }
             if (hostBufLength + clientBufLength == 0) Thread.sleep(1);
         }
@@ -120,7 +126,8 @@ public class ProxySession extends SocketSession
             // to.write(buf, 0, len);
         }
         buf = null;
-        buf = DES.decrypt(baos.toByteArray(), this.nonce);
+//        buf = DES.decrypt(baos.toByteArray(), this.nonce);
+        buf = baos.toByteArray();
         // to.write(ByteUtils.toBytes(buf.length));
         to.write(buf);
         to.flush();
@@ -141,7 +148,8 @@ public class ProxySession extends SocketSession
             // to.write(buf, 0, len);
         }
         buf = null;
-        buf = DES.encrypt(baos.toByteArray(), this.nonce);
+//        buf = DES.encrypt(baos.toByteArray(), this.nonce);
+        buf = baos.toByteArray();
         to.write((byte)0xfa);
         to.write((byte)0xfa);
         to.write((byte)0xfa);

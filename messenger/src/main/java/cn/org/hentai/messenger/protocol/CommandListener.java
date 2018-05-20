@@ -53,18 +53,17 @@ public class CommandListener implements Runnable
         byte[] resp, packet = Packet.create(hostId, Packet.ENCRYPT_TYPE_DES, cmd, accessToken);
         outputStream.write(packet);
         outputStream.flush();
-        resp = Packet.read(inputStream, true);
+        Packet.read(inputStream, true);
         Log.debug("己连接到服务器端...");
         lastExchangeTime = System.currentTimeMillis();
 
         // 2. 等待服务器的心跳测试包或是指令包
         while (true)
         {
-            resp = Packet.read(inputStream);
+            resp = Packet.read(inputStream,true);
             if (null == resp)
             {
                 if (System.currentTimeMillis() - lastExchangeTime > iowaitTimeout) break;
-                Thread.sleep(100);
                 continue;
             }
 
