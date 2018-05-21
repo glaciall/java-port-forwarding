@@ -60,7 +60,7 @@ public class CommandListener implements Runnable
         // 2. 等待服务器的心跳测试包或是指令包
         while (true)
         {
-            resp = Packet.read(inputStream,true);
+            resp = Packet.read(inputStream, true);
             if (null == resp)
             {
                 if (System.currentTimeMillis() - lastExchangeTime > iowaitTimeout) break;

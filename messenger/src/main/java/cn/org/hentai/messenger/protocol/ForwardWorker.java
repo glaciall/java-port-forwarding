@@ -125,8 +125,7 @@ public class ForwardWorker extends Thread
             // to.write(buf, 0, len);
         }
         buf = null;
-//        buf = DES.decrypt(baos.toByteArray(), this.nonce);
-        buf = baos.toByteArray();
+        buf = DES.decrypt(baos.toByteArray(), this.nonce);
         // to.write(ByteUtils.toBytes(buf.length));
         to.write(buf);
         to.flush();
@@ -147,8 +146,8 @@ public class ForwardWorker extends Thread
             // to.write(buf, 0, len);
         }
         buf = null;
-//        buf = DES.encrypt(baos.toByteArray(), this.nonce);
-        buf = baos.toByteArray();
+        buf = DES.encrypt(baos.toByteArray(), this.nonce);
+        // buf = baos.toByteArray();
         to.write((byte)0xfa);
         to.write((byte)0xfa);
         to.write((byte)0xfa);
