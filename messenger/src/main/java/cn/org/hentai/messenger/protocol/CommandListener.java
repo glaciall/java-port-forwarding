@@ -54,16 +54,17 @@ public class CommandListener implements Runnable
         outputStream.write(packet);
         outputStream.flush();
         Packet.read(inputStream, true);
-        Log.debug("己连接到服务器端...");
+        Log.debug("已连接到服务器端...");
         lastExchangeTime = System.currentTimeMillis();
 
         // 2. 等待服务器的心跳测试包或是指令包
         while (true)
         {
-            resp = Packet.read(inputStream, true);
+            resp = Packet.read(inputStream, false);
             if (null == resp)
             {
                 if (System.currentTimeMillis() - lastExchangeTime > iowaitTimeout) break;
+                Thread.sleep(5);
                 continue;
             }
 
